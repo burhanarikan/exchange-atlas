@@ -1,0 +1,171 @@
+/* =========================================================================
+   Design Tokens
+   Exchange Atlas · Erasmus · bağımsız platform markası
+   DİLMER tasarım ailesiyle aynı kökten, kendi karakteriyle.
+   v1.0 · 6 Temmuz 2026
+   ========================================================================= */
+
+/* ── Bu dosyadaki değerlerin gerekçe durumu ──────────────────────────────────
+   Dürüstlük notu. Aşağıdaki sayılar ve renkler üç ayrı kategoriye giriyor ve
+   bugün hangisinin hangisi olduğu **kayıtlı değil**:
+
+     ölçüldü            · bir gereksinime karşı sınanmış (ör. kontrast oranı)
+     düşünüldü          · gerekçesi var ama ölçülmedi (ör. ölçek adımları)
+     hiç düşünülmedi    · bir kez yazıldı, sorun çıkarmadığı için sorgulanmadı
+
+   Bilinen tek köken kaydı `--brand-navy` için var (aşağıda). Geri kalanı için
+   gerekçe yazılı değil; "böyle daha iyi" diye okunmamalıdır.
+
+   Uydurulmuş gerekçe, eksik gerekçeden kötüdür: eksik olan sorulabilir,
+   uydurulmuş olan sorgulanmaz. Bu yüzden buraya olmayan bir gerekçe
+   yazılmıyor, boşluk olduğu gibi bırakılıyor.
+
+   Erişilebilirlik: kontrast ÖLÇÜLDÜ ve DÜZELTİLDİ (1 Ağustos 2026). Üç renk
+   WCAG AA eşiğinin (4.5:1) altındaydı ve gerçek içerikte kullanılıyordu:
+
+     --ink-4      #93A0B0 → #617184   kart notu, yer tutucu, boş sonuç mesajı
+     --ink-3      #6B7686 → #66707F   sonuç sayısı, alan filtresi uyarısı
+     --brand-blue #4387C7 → #3473AF   kart bağlantıları, Temizle düğmesi
+
+   Ton korunarak yalnız açıklık düşürüldü. Eşik **iki zemine karşı** hesaplandı
+   (beyaz kart ve --bg-paper); ilk denemede yalnız beyaza bakılmıştı ve kağıt
+   zeminde kalan bir kullanım gözden kaçmıştı.
+
+   Denetim: tests/test_yayina_hazirlik.py -- renkler buradan okunuyor, değer
+   değişince kendiliğinden yeniden ölçülüyor.
+   ───────────────────────────────────────────────────────────────────────── */
+
+@import url('fonts.css');
+
+:root {
+  /* ── Atlas Kurumsal ── */
+  /* Birincil renk. Kökeni: proje Isparta Uygulamalı Bilimler Üniversitesi'nde
+     başladı ve bu lacivert oradan alındı. Üniversite platformda değil; renk,
+     işin nerede doğduğunu taşıdığı için korunuyor. Değiştirmek teknik olarak
+     serbest, ama o zaman bu köken kaydı da anlamını yitirir. */
+  --brand-navy:        #2F415F;
+  --brand-navy-deep:   #1C2A44;   /* hover, koyu zemin, header */
+  --brand-blue:        #3473AF;   /* açık etkileşim mavisi · link, focus, ikon */
+  --brand-blue-soft:   #EAF1F9;   /* tint yüzey, hover, seçili chip zemini */
+  --brand-blue-mist:   #F3F7FC;
+
+  /* ── Sıcak vurgu · hareketlilik / Erasmus katmanı (ölçülü kullan) ── */
+  /* Aşağıdaki üç sıcak ton ve --brand-blue-mist bugün HİÇ kullanılmıyor
+     (ölçüldü, 1 Ağustos 2026). Palet rezervi olarak duruyorlar; ölü kod
+     değiller ama "kullanılıyor" da sanılmamalı. */
+  --brand-warm:        #D9822B;
+  --brand-warm-deep:   #B4661A;
+  --brand-warm-mist:   #FBEEDE;
+
+  /* ── Modül vurgu renkleri ── Atlas şemsiye markası altında her program
+     (Erasmus, Mevlana, Farabi …) aynı iskelete bu tek değişkenle takılır.
+     Ana lacivert (--brand-navy) HER modülde ortak ve sabit kalır. ── */
+  --module-erasmus:    var(--brand-blue);  /* bu belge: Erasmus modülü */
+  --module-mevlana:    #3FA593;            /* rezerve · Mevlana Değişim Programı */
+  --module-farabi:     #B4661A;            /* rezerve · Farabi Değişim Programı */
+  --module-accent:     var(--module-erasmus); /* aktif modül · sayfa genelinde bunu kullan */
+
+  /* ── Nötr sistem (saf siyah yok) ── */
+  --ink:               #1C2333;
+  --ink-2:             #3E4759;
+  --ink-3:             #66707F;
+  --ink-4:             #617184;
+  --line:              #DCE1E8;
+  --line-soft:         #EAEDF2;
+  --bg:                #FFFFFF;
+  /* Kart zemini. Bir dönem on üç yerde `#fff` diye sabitti ve rengin
+     bir karar olduğu görünmüyordu · tokens.css'in işi tam olarak
+     kararları görünür kılmak. */
+  --bg-card:           #FFFFFF;
+  --bg-cream:          #F7F9FB;
+  --bg-paper:          #F1F4F8;
+
+  /* ── Semantik ── */
+  --success:           #2E8B57;
+  --success-mist:      #E5F3EB;
+  --warning:           #C97A22;
+  --warning-mist:      #FBEEDE;
+
+  /* Ink shades for chip labels. These are NOT decorative variants: --success
+     and --warning fail WCAG AA on their own mist backgrounds (3.71 and 2.92).
+     Measured; see tests/test_yayina_hazirlik.py. Do not "simplify" a chip's color
+     back to --success / --warning. */
+  --success-ink:       #1F6640;   /* on --success-mist: 6.05 */
+  --warning-ink:       #8A5314;   /* on --warning-mist: 5.52 */
+
+  /* Modal scrim. Same blue-grey base as --shadow-1, kept as its own token so
+     it is not mistaken for a shadow. */
+  --scrim:             rgba(28,42,68,.45);
+  --danger:            #C0392B;
+  --danger-mist:       #FBEAE8;
+  --info:              var(--brand-blue);
+  --info-mist:         var(--brand-blue-soft);
+
+  /* ── Tipografi (DİLMER ailesiyle aynı · Manrope + Inter) ── */
+  --font-display:      "Manrope", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-body:         "Inter", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:         "JetBrains Mono", "Source Code Pro", ui-monospace, monospace;
+
+  --text-xs:   12px;  --lh-xs: 1.4;
+  --text-sm:   14px;  --lh-sm: 1.5;
+  --text-base: 16px;  --lh-base: 1.55;
+  --text-md:   18px;  --lh-md: 1.5;
+  --text-lg:   22px;  --lh-lg: 1.35;
+  --text-xl:   28px;  --lh-xl: 1.25;
+  --text-2xl:  36px;  --lh-2xl: 1.15;
+  --text-3xl:  48px;  --lh-3xl: 1.08;
+  --text-4xl:  64px;  --lh-4xl: 1.02;
+
+  --w-reg:  400; --w-med: 500; --w-semi: 600; --w-bold: 700; --w-extra: 800;
+
+  --tracking-tight: -0.02em;
+  --tracking-snug:  -0.01em;
+  --tracking-wide:  0.03em;
+  --tracking-caps:  0.08em;
+
+  /* ── Boşluk (4px) ── */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px;
+  --s-6: 32px; --s-7: 48px; --s-8: 64px; --s-9: 96px;
+
+  /* ── Radius · kurumsal, hafif yumuşatılmış ── */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-pill: 999px;
+
+  /* ── Gölge · akademik, ölçülü ── */
+  --shadow-1: 0 1px 2px rgba(28,42,68,.06), 0 1px 3px rgba(28,42,68,.05);
+  --shadow-2: 0 2px 8px rgba(28,42,68,.07), 0 8px 20px rgba(28,42,68,.06);
+  --shadow-3: 0 12px 32px rgba(28,42,68,.12), 0 4px 10px rgba(28,42,68,.05);
+  --ring:     0 0 0 3px rgba(67,135,199,.30);
+
+  /* ── Hareket ── */
+  --ease-out: cubic-bezier(.22,.61,.36,1);
+  --t-fast: 140ms; --t-base: 220ms; --t-slow: 360ms;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--lh-base);
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: var(--brand-blue); }
+a:hover { color: var(--brand-navy); }
+
+/* ── Burada on dört yardımcı sınıf vardı (2 Ağustos 2026'da silindi) ──────────
+   .t-h1 … .t-mono, .surface-*, .divider, .card · bir tipografi ve yüzey kiti.
+   Hiçbiri kullanılmıyordu: ne HTML'de, ne app.js'in ürettiği işaretlemede, ne
+   styles.css'te, ne de deponun tek bir commit'inde. Projeye ilk iskeletle
+   birlikte, DİLMER tasarım ailesinden gelmişlerdi.
+
+   Aynı işi styles.css zaten kendi yapıyor: .agr-card kendi kenarını ve gölgesini
+   tanımlıyor, .t-h1 yerine .guide-hero h1 var. Yani kit bir seçenek değil,
+   kullanılmayan bir ikinci uygulamaydı.
+
+   Ölçek token'ları (--text-*, --lh-*, --tracking-*, --w-*) BIRAKILDI. Bu dosyanın
+   işi ölçeği tanımlamak; sınıflar o ölçeğin bir kullanımıydı, ölçeğin kendisi
+   değil. Bugün 81 token'ın 34'ü kullanılıyor -- geri kalanı "kullanılıyor"
+   sanılmasın diye bu not duruyor. ── */

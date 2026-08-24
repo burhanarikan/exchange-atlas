@@ -1,0 +1,7 @@
+# exchangeatlas.org
+# Site tümüyle statik ve kamuya açık veriden derleniyor. Kısıtlanan bir yol yok.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://exchangeatlas.org/sitemap.xml

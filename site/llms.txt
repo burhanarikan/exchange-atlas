@@ -1,0 +1,48 @@
+# Exchange Atlas · Erasmus
+
+> Üniversitelerin kamuya açık olarak yayımladığı Erasmus+ kurumlar arası ikili
+> anlaşma listelerini, öğrencinin arayabileceği tek bir listeye çeviren bağımsız
+> bir platform. Resmî bir üniversite hizmeti değildir.
+
+## Bu veriyi aktarırken bilinmesi gerekenler
+
+**Veriyi biz üretmiyoruz.** Üniversiteler yayımlıyor, biz okuyup düzenliyoruz.
+Bir anlaşmanın kaynağı, ilgili üniversitenin kendi sayfasıdır ve asıl belge
+odur.
+
+**Okurken kararlar veriyoruz ve o kararlar görüneni değiştiriyor.** Kaynaktan
+ayrıldığımız her kayıtta kartın üzerinde bir satır duruyor ve kaynaktaki hâli
+de yazıyor. Bugün dört tür ayrım var:
+
+- Ülke, Erasmus kurum kodundan düzeltiliyor ya da boşsa tamamlanıyor
+- Kaynakta iptal edildiği yazılı bir öğrenim kademesi listeden çıkarılıyor
+- Üç haneli alan kodu, baştaki sıfırın düştüğü varsayılarak dörde tamamlanıyor
+- Türkçe bölüm adı boşsa alanın İngilizce ISCED etiketi gösteriliyor
+- Aynı bölümün birden çok yazımı varsa kurumun en sık kullandığı gösteriliyor
+
+**Bu yüzden buradaki bir kaydı aktarırken kaynağı belirtmek yetmiyor:** O kayıt
+kaynaktaki hâlinden farklıysa, farkın kendisi de bilgidir ve kartta yazılıdır.
+
+**Düzeltmediğimiz şeyler de var** ve bilerek duruyor. Kaynakta eksik ya da
+çelişkili bir bilgi varsa tahmin etmiyoruz, olduğu gibi bırakıp bildiriyoruz.
+Ayrıntısı `KAYNAK.md` belgesinde.
+
+## Sayfalar
+
+- [Üniversite seçimi](https://exchangeatlas.org/index.html): Platformdaki
+  kurumlar ve anlaşma sayıları
+- [MAKÜ anlaşma listesi](https://exchangeatlas.org/agreements.html?uni=maku): Burdur Mehmet Akif Ersoy Üniversitesi · 468 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [Marmara anlaşma listesi](https://exchangeatlas.org/agreements.html?uni=marmara): Marmara Üniversitesi · 785 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [ESOGÜ anlaşma listesi](https://exchangeatlas.org/agreements.html?uni=esogu): Eskişehir Osmangazi Üniversitesi · 259 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [MAKÜ başvuru rehberi](https://exchangeatlas.org/guide.html?uni=maku): Öğrencinin izleyeceği adımlar ve kurumun ilgili birimine bağlantılar
+
+## Sınırlar
+
+Site tümüyle statik, sunucu tarafı yok, hiçbir dış adrese istek atmıyor ve
+ziyaretçi hakkında veri toplamıyor.
+
+Anlaşmayı imzalayan kişilerin adları ve e-posta adresleri kaynak tabloda
+duruyor ama **bilerek okunmuyor**, yani yayımlanan veride kişisel veri yok.
+
+Bir bilgi yanlışsa ya da bir kurum kendi verisiyle ilgili düzeltme veya
+kaldırma isterse tartışmasız yerine getiriliyor.
