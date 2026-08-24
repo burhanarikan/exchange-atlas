@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; connect-src 'self'; form-action 'none'; base-uri 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Exchange Atlas · Erasmus · İkili Anlaşmalar</title>
+  <meta name="description" content="Exchange Atlas · Erasmus, üniversitelerin Erasmus+ kurumlar arası ikili anlaşmaları. Aranabilir, filtrelenebilir liste.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Exchange Atlas · Erasmus">
+  <meta property="og:title" content="Exchange Atlas · Erasmus · İkili Anlaşma Listesi">
+  <meta property="og:description" content="Erasmus+ ikili anlaşmalarını bölüme, ülkeye, dereceye ve kontenjana göre filtrele.">
+  <meta property="og:image" content="https://exchangeatlas.org/og-cover.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:locale:alternate" content="en_US">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://exchangeatlas.org/og-cover.png">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="canonical" href="https://exchangeatlas.org/agreements.html">
+</head>
+<body>
+  <!-- ── Header ─────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="brand-lock">
+          <svg class="brand-mark" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+            <line x1="50" y1="16" x2="20" y2="86" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+            <line x1="50" y1="16" x2="80" y2="86" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
+            <path d="M31 61 Q 50 51 69 61" stroke="currentColor" stroke-width="7" stroke-linecap="round" fill="none"/>
+            <circle cx="50" cy="15" r="8.5" fill="currentColor"/>
+          </svg>
+          <div class="divider-bar"></div>
+          <div class="brand-text">
+            <div class="t1">Exchange Atlas <span class="module">· Erasmus</span></div>
+            <div class="t2" data-i18n="descriptor">Erasmus+ İkili Anlaşmalar</div>
+            <div class="t3" data-i18n="credit">Veri: ilgili üniversite koordinatörlüğü</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <a class="uni-pill" href="index.html"><span id="uniAbbr">MAKÜ</span>&nbsp;<span class="chg" data-i18n="uniChange">değiştir</span></a>
+          <nav class="header-nav">
+            <a href="agreements.html" class="active" data-i18n="navList">Anlaşmalar</a>
+            <a href="guide.html" data-i18n="navGuide">Başvuru Rehberi</a>
+          </nav>
+          <div class="lang-toggle" role="group" aria-label="Language">
+            <button data-lang="tr" class="active">TR</button>
+            <button data-lang="en">EN</button>
+          </div>
+        </div>
+      </div>
+      <div class="stat-strip" id="statRow"></div>
+    </div>
+  </header>
+
+  <!-- ── Body ───────────────────────────────── -->
+  <div class="app-body">
+    <!-- Filters: sidebar on desktop, bottom sheet on mobile -->
+    <aside class="filters" id="filters" aria-label="Filtreler">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <h2 data-i18n="filters">Filtrele</h2>
+        <button class="clear-x" id="clearBtnSheet" data-i18n="clear">Temizle</button>
+      </div>
+      <div class="filters-scroll">
+        <div class="filter-group">
+          <div class="lbl" data-i18n="country">Ülke</div>
+          <div class="chip-row" id="countryChips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="lbl" data-i18n="field">ISCED alan</div>
+          <div class="chip-row" id="familyChips"></div>
+        </div>
+        <div class="filter-group">
+          <div class="lbl" data-i18n="degree">Derece</div>
+          <div class="chip-row" id="degreeChips"></div>
+        </div>
+        <button type="button" class="toggle-row" id="quotaToggle" aria-pressed="false">
+          <span data-i18n="onlyQuota">Sadece öğrenim kontenjanı</span>
+          <span class="switch" id="quotaSwitch"></span>
+        </button>
+      </div>
+      <div class="sheet-foot">
+        <button class="apply-btn" id="applyBtn"></button>
+      </div>
+    </aside>
+    <div class="sheet-backdrop" id="sheetBackdrop" hidden></div>
+
+    <!-- Main -->
+    <main class="app-main">
+      <!-- Liste veriden çiziliyor, yani betik çalışmazsa bu alan boş kalıyor.
+           Öteki iki sayfada metin HTML'in içinde durduğu için böyle bir not
+           gerekmiyor. -->
+      <noscript>
+        <p class="noscript-note" data-tr="Bu sayfadaki liste tarayıcınızda oluşturuluyor ve JavaScript kapalı görünüyor. Anlaşma listesini görmek için JavaScript'i açmanız gerekiyor. Başvuru rehberi JavaScript olmadan da okunabiliyor." data-en="The list on this page is built in your browser and JavaScript appears to be disabled. You need to enable JavaScript to see the agreements. The application guide is readable without JavaScript.">Bu sayfadaki liste tarayıcınızda oluşturuluyor ve JavaScript kapalı görünüyor. Anlaşma listesini görmek için JavaScript'i açmanız gerekiyor. Başvuru rehberi JavaScript olmadan da okunabiliyor.</p>
+      </noscript>
+      <!-- Kaynak bildirimi · veriden çiziliyor, çünkü sayı ve adres
+           üniversiteye göre değişiyor. Sabit yazılsaydı ikinci üniversitede
+           yanlış olurdu. -->
+      <p class="source-notice" id="sourceNotice" hidden></p>
+
+      <div class="main-top">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+          <input id="search" type="search" autocomplete="off" data-i18n-ph="searchPlaceholder" placeholder="Bölüm, üniversite veya ülke ara">
+        </div>
+        <button class="filter-trigger" id="filterTrigger">
+          <span data-i18n="filterBtn">⚙ Filtrele</span>
+          <span class="badge-n" id="filterCount" hidden>0</span>
+        </button>
+      </div>
+
+      <div class="active-chips" id="activeChips"></div>
+
+      <div class="result-row" id="resultRow">
+        <span class="result-count" id="resultCount"></span>
+        <button class="clear-inline" id="clearBtn" hidden data-i18n="clear">Temizle</button>
+      </div>
+      <p class="field-notice" id="fieldNotice" hidden></p>
+
+      <div class="card-grid" id="grid"></div>
+
+      <div class="load-more-wrap">
+        <button class="load-more" id="loadMore" hidden></button>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <div class="big">🧭</div>
+        <p data-i18n="noResult">Aramanıza uygun anlaşma bulunamadı.</p>
+      </div>
+    </main>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────── -->
+  <footer class="app-footer">
+    <p id="independenceLine"></p>
+    <p id="footerText"></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

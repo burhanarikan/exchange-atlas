@@ -1,0 +1,11 @@
+# macOS / araç artıkları
+.DS_Store
+__pycache__/
+
+# lokal/ : repoya GİTMEYEN her şey (kaynak arşivleri, iç notlar, tasarım, paketler)
+lokal/
+
+# araç konfigleri (konumları sabit olduğu için lokal/ altına taşınamazlar)
+.claude/
+.mcp.json
+.trescout-kit-version

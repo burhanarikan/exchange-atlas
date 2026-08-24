@@ -1,0 +1,110 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      # node açıkça kuruluyor: iki bağlaşım testi app.js'i node ile çalıştırıyor,
+      # node yoksa unittest onları atlıyor ve atlanan test "OK" sayılıyor. Koşucu
+      # imajı değişirse iki bekçi sessizce susardı.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: pip install -r requirements.txt
+      # Testler koşuyor VE atlanan test sayısı denetleniyor.
+      #
+      # Sebebi ölçüldü: Yerelde 134 test geçiyordu, CI'da 133 geçip biri
+      # atlanıyordu · fark `lokal/` klasörü. O klasör depoya girmiyor
+      # (AGENTS.md §9.a) ve içindeki kaynak Excel'e bağlı olan test CI'da hiç
+      # koşmuyor. "CI yeşil" cümlesi bu yüzden "her şey doğrulandı" demek
+      # değil ve bu fark HİÇBİR YERDE GÖRÜNMÜYORDU · dışarıdan bir okuyucu
+      # iki kez söyledi, iki kez yerelde ölçüp yanlış cevap verdim.
+      #
+      # Bu adım farkı görünür kılıyor: Atlanan test sayısı beklenenden çoksa
+      # derleme duruyor. Yani yeni bir sessiz atlama eklenemiyor.
+      - name: testler · atlanan sayısı denetimli
+        run: |
+          set -o pipefail
+          python -m unittest discover -s tests -v 2>&1 | tee /tmp/test.log
+          # Beklenen atlama sayısı · her biri GEREKÇELİ olmak zorunda.
+          #
+          #   1) test_baslik_tablosu_kaynakla_uyusuyor
+          #      Ayrıştırıcının okuduğu sütunlar kaynak Excel'de yerinde mi.
+          #   2) KaynakKunyesi::test_yerel_dosya_varsa_ozeti_kunyeyle_ayni
+          #      Yerel snapshot'ın özeti künyedekiyle aynı mı.
+          #
+          # İkisi de `lokal/` altındaki kaynak dosyaya bağlı ve o klasör depoya
+          # girmiyor (AGENTS.md §9.a). İkisi de kaynak tablo güncellendiğinde
+          # ELLE koşturulmalı · README-DEPLOY.md'de komutuyla yazılı.
+          #
+          # Bu sayı artırılacaksa, artıran kişi yukarıya gerekçesini de yazıyor.
+          BEKLENEN=2
+          # "... skipped 'sebep'" satırları sayılıyor · özet satırı ("OK
+          # (skipped=1)") sayıma girmesin diye kalıp dar tutuldu. İlk hâli
+          # onu da saydı ve bir atlamayı iki gösterdi.
+          ATLANAN=$(grep -c "\.\.\. skipped" /tmp/test.log || true)
+          echo "Atlanan test: $ATLANAN (beklenen: $BEKLENEN)"
+          if [ "$ATLANAN" -gt "$BEKLENEN" ]; then
+            echo "HATA: Beklenenden çok test atlandı."
+            grep "\.\.\. skipped" /tmp/test.log
+            echo "Yeni bir atlama eklendiyse gerekçesi buraya ve beklenen sayıya yazılmalı."
+            exit 1
+          fi
+          echo "Atlananlar (CI'da koşmayan denetimler):"
+          grep "\.\.\. skipped" /tmp/test.log || echo "  yok"
+
+          # Belgelerde önerilen komut da ayrıca koşuyor.
+          #
+          # Sebebi: Yukarıdaki çağrı kökten keşif yapıyor, README ve
+          # CONTRIBUTING ise `-s tests` öneriyor. İkisi FARKLI kod yolları ·
+          # biri geçerken öteki kırılabiliyor ve o kırılma yalnız kullanıcıda
+          # görünürdü. Dışarıdan bir okuyucu tam bunu iddia etti; iddia
+          # üretilemedi ama iki yolun ayrı ayrı sınanmaması gerçek bir açıktı.
+          echo "Belgelerde önerilen komut:"
+          python -m unittest discover -s tests
+
+  # Pages açılana kadar bu iş ATLANIYOR ve sebebi bir kural.
+  #
+  # Pages kapalıyken `configure-pages` "site bulunamadı" diyip kırılıyordu ve
+  # her commit kırmızı görünüyordu. Testler geçtiği hâlde. Sonuç şuydu:
+  # Kırmızı normalleşti, yani testler GERÇEKTEN bozulsa kimse fark etmeyecekti.
+  # Yanlış alarm en pahalı kusur · boşa çalan bir alarm, gerçek
+  # alarmı da sağır ediyor.
+  #
+  # Yayın günü: Depo ayarlarından `PAGES_ENABLED` değişkeni `true` yapılıyor,
+  # Pages açılıyor. İkisi tek bir bilinçli hareket · sertifika sınırı yüzünden
+  # Pages'in "tek denemede" açılması gerekiyor, deneme yanılma yapılamıyor.
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

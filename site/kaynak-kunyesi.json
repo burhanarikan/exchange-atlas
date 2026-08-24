@@ -1,0 +1,53 @@
+{
+  "_aciklama": "Kaynak dosyaların künyesi. Dosyaların kendisi depoya girmiyor (CONTRIBUTING.md, 2. kural), bu künye giriyor: Hangi dosyadan üretildiği, ne zaman indirildiği, özeti ve tablonun yapısı burada yazılı. Amaç yeniden üretilebilirlik.",
+  "kaynaklar": [
+    {
+      "id": "maku",
+      "kurum": "Burdur Mehmet Akif Ersoy Üniversitesi",
+      "birim": "Uluslararası İlişkiler Koordinatörlüğü",
+      "liste_sayfasi": "https://iro.mehmetakif.edu.tr/content/24317/1/erasmus-ka131-ikili-anlasmalari",
+      "dosya_adresi": "https://depo2.mehmetakif.edu.tr/storage/iro/contents/24317/29_24317_2026-03-31-10-48-36-47697_ka-3--ikili-anlasmalar-surum-2-22-26.xlsx",
+      "adres_notu": "Dosya adresi tarih ve sürüm içeriyor, yani KIRILGAN. Kurum listeyi güncellediğinde bu adres ölür. Kalıcı olan liste sayfası · yeni dosyanın adresi oradan alınır.",
+      "yerel_ad": "lokal/maku/maku-ka131-ikili-anlasmalar.xlsx",
+      "sha256": "6f03926ab680e782cf354bdd63dc40acdfcda63141323d1c06042c0a71be225c",
+      "boyut_bayt": 90239,
+      "indirme_tarihi": "2026-07-07",
+      "kayit_sayisi": 468
+    },
+    {
+      "id": "marmara",
+      "kurum": "Marmara Üniversitesi",
+      "birim": "Uluslararası İlişkiler Koordinatörlüğü",
+      "liste_sayfasi": "https://cloud.marmara.edu.tr/s/1kNVSU18NKjHkdy?openfile=true",
+      "dosya_adresi": null,
+      "adres_notu": "Dosya bir paylaşım bağlantısının arkasında ve adres bir jeton taşıyor · doğrudan indirilebilir kalıcı bir adresi YOK. Kurum listeyi yenilediğinde dosya elle alınır. Bu yüzden `build_data.py --pull` bu kaynağı atlıyor ve atladığını söylüyor.",
+      "yerel_ad": "lokal/marmara/marmara-ka131-ikili-anlasmalar.xlsx",
+      "yapi_notu": "27 sayfa, fakülte başına bir sayfa. Her sayfanın ALTINDA ayrı bir tablo var: 'Zorunlu Dil ID' sözlüğü. Yabancı dil sütunu sayı taşıyor (1, 1;19) ve o sözlük olmadan okunamıyor · 66 giriş, 27 sayfada da tutarlı.",
+      "sha256": "dc6dfbd7333d38833c2b7f1340485e5cd31bf0bde9341740940a7a00cda5b84f",
+      "boyut_bayt": 168375,
+      "indirme_tarihi": "2026-08-23",
+      "kayit_sayisi": 785
+    },
+    {
+      "id": "esogu",
+      "kurum": "Eskişehir Osmangazi Üniversitesi",
+      "birim": "Uluslararası İlişkiler Birimi",
+      "liste_sayfasi": "https://iro.ogu.edu.tr/Sayfa/Index/22/ikili-anlasmalar",
+      "dosya_adresi": null,
+      "adres_notu": "Dosya liste sayfasından indiriliyor; doğrudan bir kalıcı adres kaydedilmedi. Yeni dosya liste sayfasından alınır.",
+      "yerel_ad": "lokal/esogu/esogu-ikili-anlasmalar.xlsx",
+      "yapi_notu": "Tek sayfa. Fakülte hücreleri blok başında bir kez yazılı (259 satırın 16'sında), sonrası boş · ileri doldurma gerekiyor ve fakülte değişince bölüm sıfırlanmalı. Kontenjan dört ayrı sayı sütununda (ön lisans / lisans / yüksek lisans / doktora). Partner üniversitenin web adresi de var.",
+      "sha256": "2dbe73e1ac6395ccb3a7b7cbec90f01b19544272187ac3370445a3c307a6a229",
+      "boyut_bayt": 40791,
+      "indirme_tarihi": "2026-08-23",
+      "kayit_sayisi": 259
+    }
+  ],
+  "yeniden_uretim": [
+    "1. Liste sayfasından güncel Excel'i indirin ve yerel_ad yoluna koyun.",
+    "2. python3 scripts/build_data.py            (yerel snapshot'tan üretir)",
+    "3. python3 scripts/build_data.py --pull     (canlı adresten tazeler, sonra üretir)",
+    "4. python3 -m unittest discover -s tests    (sütunlar kaymışsa burada durur)",
+    "5. Dosya değiştiyse bu künyedeki sha256, boyut, tarih ve kayıt sayısı güncellenir."
+  ]
+}
