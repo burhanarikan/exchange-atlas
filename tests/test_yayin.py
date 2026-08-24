@@ -1,7 +1,7 @@
-"""Yayın önkoşulları · biri eksikse yayını durdurur.
+"""Yayın bütünlüğü · biri eksikse yayını durdurur.
 
-Buradaki testler "kod çalışıyor mu" diye bakmıyor, **yayına çıkmadan önce
-yapılmış olması gereken** işleri denetliyor.
+Buradaki testler "kod çalışıyor mu" diye bakmıyor, **yayın bütünlüğünü**
+ve canlıya çıkmadan önce tamamlanması gereken koşulları denetliyor.
 
 Neden test olarak: Bu tür eksikler belgeye yazıldığında kimse okumadığı için
 unutuluyor. Bir kez yaşandı · bir belgede aylarca duran eskimiş bir bilgi
@@ -18,8 +18,8 @@ ifade ediliyor. `UniversiteEklemeOnKosulu` bunu yapıyor · bugün yeşil, ikinc
 üniversite eklendiği gün kırmızı. Borç, ödenmesi gereken ana kadar sessiz
 duruyor.
 
-`YayinKapisi` aynı kalıbın en büyüğü: README **"henüz yayında değil"** demeyi
-bıraktığı gün açılıyor ve o güne kadar sessiz.
+`YayinKapisi` aynı kalıbın en büyüğü: README yayın durumunu açıkça bildiriyor;
+kapı, dokümantasyon ve makinenin görebildiği yayın koşulları ayrıştığında kırılıyor.
 """
 import json
 import re
@@ -30,19 +30,12 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 class YayinKapisi(unittest.TestCase):
-    """Yayın anında sağlanması gereken şartlar · o âna kadar sessiz.
+    """Yayın bütünlüğünü koruyan makinece görülebilir koşullar.
 
-    Kayıtta istenen şey buydu: *"Yayına girmeden önce yapılacaklar listesi olur,
-    herhangi biri yapılmadıysa yayına girmeye izin vermez."*
-
-    Kapı `README.md`'nin **"henüz yayında değil"** demeyi bırakmasıyla
-    açılıyor. Bu depoda kalıcı kırmızı test tutulmuyor, o yüzden şartlar yayın
-    anına kadar beklemede duruyor.
-
-    **Buraya yalnız makinenin görebildiği şey giriyor.** Kurumsal e-postanın
-    kurulduğu görülebiliyor; koordinatörlüğe bildirim gönderildiği
-    görülemiyor. Görülemeyeni buraya yazmak, kapıyı bir hatırlatma listesine
-    çevirirdi ve o liste ilk yanlış alarmda susturulurdu.
+    **Buraya yalnız makinenin görebildiği şey giriyor.** DNS sağlayıcısına
+    bildirim gönderildiği veya bir kurumla iletişim kurulduğu görülemiyor;
+    görünmeyen işleri test kapısına yazmak, kapıyı susturulabilir bir hatırlatma
+    listesine çevirirdi.
     """
 
     KISISEL_SAGLAYICI = ("gmail.com", "hotmail.com", "outlook.com", "yahoo.com",
@@ -51,24 +44,18 @@ class YayinKapisi(unittest.TestCase):
 
     # KARAR · 24 Ağustos 2026
     #
-    # Kurumsal adres yayın önkoşuluydu ve bu koşul BİLEREK kaldırıldı: Yayın
-    # kişisel adresle yapılıyor, kurumsal kutu sonra kuruluyor.
+    # Açık kaynak ve canlı yayın iletişim adresi olarak bu adres bilinçli biçimde
+    # kullanılıyor. Adres parça parça yazıldığı için basit toplayıcılara karşı
+    # küçük bir koruma sağlanıyor; güvenlik bildirimi için ayrıca SECURITY.md
+    # doğrudan iletişim kanalını tarif ediyor.
     #
-    # Sebebi maliyet-fayda: Adres kurmak yayını günlerce erteliyor ve kişisel
-    # adresle yayımlamanın somut zararı sınırlı · site zaten adresi parça
-    # parça yazıyor (basit toplayıcılara karşı) ve gelen yazışma az.
-    #
-    # Kapı SİLİNMEDİ ve sebebi bu deponun kendi dersi: Silinen bir koşul
-    # unutuluyor. Bugün kapı kişisel adresi geçiriyor ama BAŞKA BİR şey
-    # yapıyor · aşağıdaki listeye yazılmamış bir sağlayıcı hâlâ yayını
-    # durduruyor. Yani karar "kişisel adres serbest" değil, "BU adres, bilerek".
-    #
-    # Kurumsal adres kurulduğunda yapılacak: MUAF listesini boşalt. Liste
-    # boşken bekçi ilk hâline dönüyor.
+    # MUAF listesi kaldırılmadı: Kişisel sağlayıcıya ait başka bir adresin
+    # belgelerde kazara yayımlanmasını engelliyor. İleride kurumsal adrese
+    # geçilirse adres ve bu liste birlikte güncellenmeli.
     MUAF = ("burhanarikan@yaani.com",)
 
     def yayinda_mi(self):
-        return "henüz yayında değil" not in (ROOT / "README.md").read_text(encoding="utf-8")
+        return "**Durum:** yayında." in (ROOT / "README.md").read_text(encoding="utf-8")
 
     def metinler(self):
         for ad in ("README.md", "KAYNAK.md", "NOTICE.md"):
@@ -284,25 +271,17 @@ def kontrast(on, arka):
 
 
 class GeriBildirimAdresi(unittest.TestCase):
-    """Adres beş yerde yazılı ve bugünkü hâli geçici.
+    """Adresin tüm kullanıcıya dönük kopyalarını bilinçli tutar.
 
-    Sitedeki tek geri dönüş kanalı bu. Sıfır dış istek ilkesi yüzünden hata
-    toplama yok; kullanıcı bir şey bildirecekse buradan bildiriyor.
-
-    **Bugünkü adres kişisel** ve yayına çıkmadan önce kurumsal bir adrese
-    geçmesi gerekiyor. Bunu koşula bağlayan bir test yazılamıyor: "yayına
-    çıkıldı" hâlini programla anlamanın bir yolu yok. Bu bir sınır ve
-    saklanmıyor.
-
-    Buradaki test bunun yerine şunu yapıyor: Adresi sabitliyor. Değiştirmek
-    isteyen kişi bu satırı da değiştirmek zorunda kalıyor, yani değişiklik
-    kazara değil bilinçli oluyor. Beş yerin birlikte değişmesini ise
-    `test_couplings.py::Baglasim13_GeriBildirimAdresi` denetliyor.
+    Sıfır dış istek ilkesi yüzünden uygulama içi hata toplama yok; kullanıcı,
+    kurum veya katkıcı bir şey bildirecekse bu kanalı kullanıyor. Adresin
+    değiştirilmesi bilinçli bir ürün/operasyon kararıdır ve bu bekçi kazara
+    yapılan tekil kopya değişikliklerini yakalar.
     """
 
     BUGUNKU = "burhanarikan@yaani.com"
-    DURUM = ("Kişisel adres. Yayın önkoşulu: kurumsal bir adrese geçilecek "
-             "(ör. exchangeatlas.org alan adı altında). Kutu henüz kurulmadı.")
+    DURUM = ("Public depoda ve canlı sitede bilinçli kullanılan geri bildirim "
+             "adresi. Kurumsal adrese geçilirse tüm kopyalar birlikte güncellenmeli.")
 
     def test_adres_kayitli_olanla_ayni(self):
         parcali = (ROOT / "site" / "app.js").read_text(encoding="utf-8")

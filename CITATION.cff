@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "Exchange Atlas'ı kullanır veya katkıda bulunursanız lütfen bu projeyi belirtin."
+title: "Exchange Atlas"
+abstract: "Üniversitelerin Erasmus+ kurumlar arası ikili anlaşmalarını aranabilir ve filtrelenebilir biçimde sunan bağımsız, statik platform."
+version: "1.0.0"
+date-released: 2026-08-24
+repository-code: "https://github.com/burhanarikan/exchange-atlas"
+url: "https://exchangeatlas.org"
+license: "MIT"
+authors:
+  - family-names: "Arıkan"
+    given-names: "Burhan"
+    affiliation: "Independent"

@@ -1,6 +1,6 @@
-# Exchange Atlas · yayın öncesi kontrol
+# Exchange Atlas · yayın ve canlı doğrulama
 
-Bu belge, `site/` klasörünü canlıya almadan önce uygulanacak son kontrolleri tanımlar. Site statiktir: sunucu tarafında çalışacak bir uygulama, veritabanı veya kullanıcı formu yoktur. Buna rağmen güvenlik başlıkları, TLS/DNS ve gerçek tarayıcı yanıtı ayrıca doğrulanmalıdır.
+Bu belge, `site/` klasörünün Cloudflare Pages üzerinde güvenli biçimde yayımlanması ve canlı yayın sonrasında doğrulanması için uygulanacak kontrolleri tanımlar. Site statiktir: sunucu tarafında çalışacak bir uygulama, veritabanı veya kullanıcı formu yoktur. Buna rağmen güvenlik başlıkları, TLS/DNS ve gerçek tarayıcı yanıtı ayrıca doğrulanmalıdır.
 
 ## 1. Yerel kalite kapısı
 
@@ -19,28 +19,19 @@ find site -type f -not -path '*/.git/*' -print | sort
 
 Kaynak Excel dosyaları ve kişisel iletişim bilgileri yayın paketine alınmaz. Veri yenilendiyse `site/kaynak-kunyesi.json` içindeki kaynak tarihi, özet bilgisi ve SHA-256 değeri de güncellenir.
 
-## 2. GitHub Pages yayın koşulu
+## 2. Cloudflare Pages yayın koşulu
 
-GitHub Actions workflow'u test işini her push ve pull request'te çalıştırır. Pages deploy işi yalnızca şu iki koşul birlikte sağlandığında çalışır:
+Kanonik yayın Cloudflare Pages üzerindedir. Cloudflare projesi GitHub'daki `main` dalına bağlıdır; her push sonrasında `site/` klasörü build output olarak yayımlanır. Framework kullanılmadığı için build command boş bırakılır, root directory `/`, output directory `site` olur.
 
-1. Olay `pull_request` değildir.
-2. Depo değişkeni `PAGES_ENABLED` değeri tam olarak `true`'dur.
+GitHub Actions workflow'u test işini her push ve pull request'te çalıştırır. Eski GitHub Pages yolu yalnız `PAGES_ENABLED=true` açıkça ayarlanırsa çalışır; kanonik Cloudflare yayında bu değişken `false` bırakılır veya tanımlanmaz. Beklenen CI durumu `test: success`, legacy `deploy: skipped` ve canlı adres tanımlıysa `live_check: success` değeridir.
 
-Yayın kararı verildiğinde değişken depo ayarlarından veya GitHub CLI ile tanımlanabilir:
-
-```bash
-gh variable set PAGES_ENABLED --body true -R burhanarikan/exchange-atlas
-```
-
-Bu komut Pages'i tek başına etkinleştirmez; Pages ayarı, özel alan adı ve HTTPS yapılandırması da GitHub depo ayarlarında tamamlanmalıdır. Yayın kararı verilmeden bu değişkeni `true` yapmayın.
-
-Canlı deploy sonrasında response header doğrulamasını etkinleştirmek için, header'ları gerçekten gönderen kanonik adresi ayrıca tanımlayın:
+Canlı response header doğrulaması için repository variable olarak şu adres tanımlı olmalıdır:
 
 ```bash
 gh variable set LIVE_SITE_URL --body https://exchangeatlas.org -R burhanarikan/exchange-atlas
 ```
 
-`LIVE_SITE_URL` boş bırakılırsa `live_check` işi atlanır. Tanımlandığında workflow ana route'ları, üç üniversite listesini ve MAKÜ rehberini gerçek HTTP yanıtları üzerinden kontrol eder. GitHub Pages header'ları uygulamıyorsa işin kırmızı olması beklenen sonuçtur; bu durumda edge/proxy veya header destekleyen bir statik barındırma katmanı yapılandırılmalıdır.
+`LIVE_SITE_URL` tanımlandığında workflow ana route'ları, üç üniversite listesini ve MAKÜ rehberini gerçek HTTP yanıtları üzerinden kontrol eder. Cloudflare Pages `_headers` dosyasını parse ederek güvenlik başlıklarını canlı yanıta ekler; başlıklar görünmüyorsa yayın güvenli kabul edilmez.
 
 ## 3. Gerçek HTTP response header'ları
 

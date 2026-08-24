@@ -90,15 +90,17 @@ yoktur ya da denetim boştur · ikisini ayırmanın yolu onu bir kez kırmak.
 - Yerleşik olmayan bir terim kullandıysanız yanında **kaynağını** yazın ·
   yerleşik mi, bizim adlandırmamız mı
 
-### Commit
+### Commit ve pull request
 
-`tip(araç): ...` · parantezde **kullanılan araç** yazılı, bugüne kadar hep
-`claude-code` oldu · örnek: `feat(claude-code): ...`
+Commit mesajı değişikliğin **nedenini** açıkça taşımalı. Kısa bir biçim kullanmak
+isterseniz `feat:`, `fix:`, `docs:`, `test:` ve `chore:` öneklerinden birini seçin;
+araç veya üretim yöntemi commit mesajına yazılmak zorunda değildir.
 
-Mesaj değişikliğin **neden** yapıldığını taşıyor · gerekçesini, ölçümünü ve
-varsa reddedilen alternatifi. Bu depoda ayrı bir değişiklik günlüğü
-tutulmuyor, o iş commit mesajlarında yapılıyor · ikinci bir günlük aynı bilgiyi
-ikinci bir yerde tutmak olurdu.
+Pull request açarken değişikliğin etkisini, veri kaynağını ve çalıştırdığınız testleri
+belirtin. Depodaki [pull request şablonu](.github/PULL_REQUEST_TEMPLATE.md) bu
+kontrolleri hatırlatır. Anlamlı kullanıcı veya bakım değişiklikleri ayrıca
+[`CHANGELOG.md`](CHANGELOG.md)'ye eklenebilir; veri yenilemelerinin teknik künyesi
+[`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da tutulur.
 
 ---
 

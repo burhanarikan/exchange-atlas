@@ -5,8 +5,15 @@ filtrelenebilir** biçimde sunan bağımsız, statik platform. Binlerce satırl�
 Excel tablosu yerine: Bölümünü yaz, ülkeni seç, kontenjanı ve dil şartını tek
 bakışta gör.
 
-**Alan adı:** exchangeatlas.org · **henüz yayında değil.** Depo şu an özel,
-GitHub Pages kapalı. Yayın öncesi son adımlar `README-DEPLOY.md`'de yazılı.
+**Canlı site:** [exchangeatlas.org](https://exchangeatlas.org) · **Durum:** yayında.
+Depo public ve katkıya açık. Kanonik yayın Cloudflare Pages üzerinde; yayın doğrulama
+ve geri dönüş prosedürü [`README-DEPLOY.md`](README-DEPLOY.md)'de yazılıdır.
+
+[![Live site](https://img.shields.io/website?url=https%3A%2F%2Fexchangeatlas.org&label=live%20site)](https://exchangeatlas.org)
+[![Quality checks](https://github.com/burhanarikan/exchange-atlas/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/burhanarikan/exchange-atlas/actions/workflows/pages.yml)
+[![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
+
+**Hızlı bağlantılar:** [Canlı site](https://exchangeatlas.org) · [Katkı rehberi](CONTRIBUTING.md) · [Güvenlik bildirimi](SECURITY.md) · [Davranış kuralları](CODE_OF_CONDUCT.md) · [Değişiklik günlüğü](CHANGELOG.md) · [Atıf](CITATION.cff)
 
 Şu an platformdaki üniversiteler:
 
@@ -20,7 +27,7 @@ Kaynak çekim tarihleri kurum bazında değişir; her dosyanın tarihi, özeti v
 [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da yazılıdır. Üretilen JSON'un
 `generatedAt` alanı ise son veri üretim zamanını gösterir.
 
-Yeni üniversiteler eklenecek · katkıda bulunmak için [aşağıya](#katkı) bakın.
+Yeni üniversiteler topluluk katkılarıyla eklenecek · katkıda bulunmak için [aşağıya](#katkı) bakın.
 
 ## Nasıl çalışır
 
@@ -33,8 +40,9 @@ kamuya açık Excel listelerinden derleme anında JSON'a çevrilir:
 python3 scripts/build_data.py --pull
 ```
 
-Yayın, `main`'e push ile GitHub Pages üzerinden otomatik yapılır
-(`.github/workflows/pages.yml`).
+Cloudflare Pages, `main`'e push sonrasında siteyi otomatik yayımlar. GitHub Actions
+workflow'u (`.github/workflows/pages.yml`) testleri, yayın paketi kontrollerini ve
+`LIVE_SITE_URL` tanımlıysa kanonik canlı adresin response header doğrulamasını çalıştırır.
 
 ## Verisini kullandığımız kurumlar için
 
@@ -58,12 +66,12 @@ Yerelde bakmak için:
 python3 -m http.server 8765 --directory site
 ```
 
-### Yayın öncesi kontrol
+### Yayın ve bakım kontrolü
 
-Yayın ortamını, gerçek HTTP response header'larını, HTTPS/DNS'i ve canlı smoke-test'i
-adım adım doğrulamak için [`README-DEPLOY.md`](README-DEPLOY.md) belgesini izleyin.
-GitHub Pages tarafında depo değişkeni `PAGES_ENABLED=true` yapılmadan yayın işi
-bilinçli olarak çalışmaz.
+Cloudflare Pages kurulumu, gerçek HTTP response header'ları, HTTPS/DNS, canlı smoke-test
+ve rollback adımları [`README-DEPLOY.md`](README-DEPLOY.md) belgesinde açıklanır.
+Veri yenilemeleri bakımcı makinesinde yapılır; canlıya geçmeden önce iki test keşif
+komutu ve `git diff --check` çalıştırılır.
 
 ### Bilgi İşlem için güvenlik özeti
 
@@ -138,7 +146,7 @@ Yaptığı şey **ileride konulmasını** engellemek.
 python3 -m unittest discover tests
 ```
 
-Kurulum yok, bağımlılık yok, ağ yok. Dört dosya, işlerine göre ayrılmış:
+Kurulum yok, bağımlılık yok, ağ yok. Beş dosya, işlerine göre ayrılmış:
 
 | Dosya | Ne denetliyor |
 |---|---|
@@ -146,6 +154,7 @@ Kurulum yok, bağımlılık yok, ağ yok. Dört dosya, işlerine göre ayrılmı
 | `test_site.py` | İki dil, marka, erişilebilirlik, renk, sıfır dış istek |
 | `test_belgeler.py` | Belgelerdeki bağlantılar, sayılar ve yazım |
 | `test_yayin.py` | Yayın önkoşulları · biri eksikse yayını durdurur |
+| `test_acik_kaynak.py` | Public depo belgeleri, şablonları ve bariz gizli anahtar kalıpları |
 
 ## Yeni üniversite eklemek
 
@@ -166,7 +175,9 @@ durumunu sabitliyor, sayılardan biri değişirse kırılıyor.
 ## Katkı
 
 Ayrıntılı yol: [`CONTRIBUTING.md`](CONTRIBUTING.md) · üniversite personeli,
-öğrenci ve kod yazan için üç ayrı bölüm.
+öğrenci ve kod yazan için üç ayrı bölüm. Davranış kuralları [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md),
+güvenlik bildirimleri [`SECURITY.md`](SECURITY.md) ve değişiklik geçmişi [`CHANGELOG.md`](CHANGELOG.md)
+içinde tutulur.
 
 Açık kaynak · kod [MIT](LICENSE), veri ve içerik ayrı koşullarda
 ([`NOTICE.md`](NOTICE.md)). Katkıya açığız:
