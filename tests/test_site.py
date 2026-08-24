@@ -231,6 +231,29 @@ class MarkaAdi(unittest.TestCase):
                 self.assertIn(self.MARKA, m.group(1))
 
 
+class RepositoryBaglantisi(unittest.TestCase):
+    """GitHub deposu tüm kullanıcı-facing sayfalarda görünür ve tıklanabilir kalmalı."""
+
+    URL = "https://github.com/burhanarikan/exchange-atlas"
+
+    def test_repo_linki_kullanici_sayfalarinda_tanimli(self):
+        index = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
+        guide = (ROOT / "site" / "guide.html").read_text(encoding="utf-8")
+        agreements = (ROOT / "site" / "agreements.html").read_text(encoding="utf-8")
+        app = APP_JS
+        app = app.read_text(encoding="utf-8")
+        linkedin = (ROOT / "site" / "linkedin.html").read_text(encoding="utf-8")
+        for ad, text in (("index.html", index), ("guide.html", guide), ("linkedin.html", linkedin)):
+            with self.subTest(sayfa=ad):
+                self.assertIn(self.URL, text)
+                self.assertIn('class="repo-line"', text)
+                self.assertIn('target=\'_blank\'', text)
+                self.assertIn('rel=\'noopener\'', text)
+        self.assertIn('id="repoLine"', agreements)
+        self.assertIn(self.URL, app)
+        self.assertIn('id="repoLine"', agreements)
+
+
 class BagimsizlikUyarisi(unittest.TestCase):
     """COUPLINGS §7 · aynı cümle üç sayfada, iki ayrı mekanizmayla yazılı.
 

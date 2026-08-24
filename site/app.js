@@ -561,6 +561,10 @@ function applyLang() {
     ? "If you are an institution whose data appears here: correction and removal requests are honoured without asking for a reason."
     : "Verisi burada görünen bir kurumsanız: Düzeltme ya da kaldırma talebiniz gerekçe sorulmadan yerine getirilir.");
   ft.appendChild(soz);
+  const repo = $("#repoLine");
+  if (repo) repo.innerHTML = lang === "en"
+    ? '<span>Code, source documents and contributions: </span><a href="https://github.com/burhanarikan/exchange-atlas" target="_blank" rel="noopener">GitHub repository</a>.'
+    : '<span>Kod, kaynak belgeler ve katkılar için: </span><a href="https://github.com/burhanarikan/exchange-atlas" target="_blank" rel="noopener">GitHub deposu</a>.';
   document.title = `Exchange Atlas · Erasmus · ${UNI.abbr} ` + L.descriptor;
 }
 

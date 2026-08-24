@@ -8,6 +8,8 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+- Ana sayfa, anlaşma listesi, rehber ve LinkedIn paylaşım alias’ı footer’larına public GitHub repository bağlantısı eklendi.
+
 ## [1.0.0] - 2026-08-24
 
 ### Added
