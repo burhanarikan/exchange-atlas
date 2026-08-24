@@ -137,3 +137,12 @@ Yayınlanan adres üzerinde masaüstü ve mobil görünümde şu akışlar tamam
 Deploy tamamlandıktan hemen sonra workflow sonucu, özel alan adı, HTTPS yönlendirmesi ve header komutları tekrar çalıştırılır. İlk birkaç saat içinde kaynak bağlantılarının durum kodları ve tarayıcı konsolu kontrol edilir. Bir üniversite kendi verisiyle ilgili düzeltme veya kaldırma talebi gönderirse talep kaynağı doğrulanır, kayıt güncellenir ve yeni veri üretimiyle birlikte testler tekrar çalıştırılır.
 
 Yayının canlı olması, anlaşma bilgilerinin başvuru dönemi için kesin veya bağlayıcı olduğu anlamına gelmez. Kullanıcıya her zaman kurumun güncel resmî listesini esas alması gerektiği gösterilmelidir.
+
+
+## 9. Cloudflare Pages ile kanonik yayın
+
+GitHub Pages response header'ları uygulamıyorsa Cloudflare Pages kanonik yayın katmanı olarak kullanılabilir. Cloudflare dashboard'da **Workers & Pages > Create application > Pages > Connect to Git** akışından `burhanarikan/exchange-atlas` deposunu bağlayın. Production branch `main`, Root directory `/`, Build command boş ve Build output directory `site` olmalıdır. Framework seçmeyin; proje doğrudan statik HTML'dir.
+
+Pages projesi oluşturulduktan sonra **Custom domains > Set up a domain** üzerinden `exchangeatlas.org` alan adını ekleyin. Apex alan adı kullanıldığı için domain Cloudflare hesabında zone olarak bulunmalı ve nameserver'lar Cloudflare'a yönlenmelidir. Cloudflare, custom domain ilişkilendirmesi tamamlandıktan sonra sertifika ve DNS durumunu dashboard'da gösterir. Sadece DNS'e elle CNAME eklemek custom domain ilişkilendirmesinin yerine geçmez.
+
+Cloudflare Pages'te `site/_headers` dosyası build output içinde parse edilir. GitHub Actions tarafında eski GitHub Pages yolunu kapatmak için `PAGES_ENABLED=false` bırakılabilir; `LIVE_SITE_URL=https://exchangeatlas.org` tanımlandığında `live_check`, GitHub Pages deploy'undan bağımsız olarak test işinden sonra kanonik Cloudflare adresini kontrol eder. Beklenen sonuç `test: success`, `deploy: skipped` ve Cloudflare yayınlandıktan sonra `live_check: success` durumudur.

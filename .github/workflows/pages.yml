@@ -79,7 +79,8 @@ jobs:
           echo "Belgelerde önerilen komut:"
           python -m unittest discover -s tests
 
-  # Pages açılana kadar bu iş ATLANIYOR ve sebebi bir kural.
+  # GitHub Pages legacy yayın yolu yalnız açıkça etkinleştirildiğinde çalışır.
+  # Cloudflare Pages kanonik yayın olduğunda PAGES_ENABLED=false bırakılabilir.
   #
   # Pages kapalıyken `configure-pages` "site bulunamadı" diyip kırılıyordu ve
   # her commit kırmızı görünüyordu. Testler geçtiği hâlde. Sonuç şuydu:
@@ -87,9 +88,7 @@ jobs:
   # Yanlış alarm en pahalı kusur · boşa çalan bir alarm, gerçek
   # alarmı da sağır ediyor.
   #
-  # Yayın günü: Depo ayarlarından `PAGES_ENABLED` değişkeni `true` yapılıyor,
-  # Pages açılıyor. İkisi tek bir bilinçli hareket · sertifika sınırı yüzünden
-  # Pages'in "tek denemede" açılması gerekiyor, deneme yanılma yapılamıyor.
+  # GitHub Pages legacy yayın yolu yalnız açıkça etkinleştirildiğinde çalışır.
   deploy:
     needs: test
     if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
@@ -112,9 +111,11 @@ jobs:
   # LIVE_SITE_URL tanımlandığında deploy sonrası gerçek HTTP yanıtlarını kontrol eder.
   # GitHub Pages özel header'ları uygulamıyorsa bu iş bilinçli olarak kırılır ve
   # yayın ortamının bir edge/proxy katmanına ihtiyacı olduğu görünür.
+  # LIVE_SITE_URL tanımlandığında, GitHub Pages deploy edilse de edilmese de
+  # kanonik canlı adresin gerçek HTTP yanıtlarını kontrol eder.
   live_check:
-    needs: deploy
-    if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true' && vars.LIVE_SITE_URL != ''
+    needs: test
+    if: github.event_name != 'pull_request' && vars.LIVE_SITE_URL != ''
     runs-on: ubuntu-latest
     steps:
       - name: canlı route ve güvenlik header denetimi
