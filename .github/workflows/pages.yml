@@ -106,7 +106,7 @@ jobs:
         with:
           path: site
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # LIVE_SITE_URL tanımlandığında deploy sonrası gerçek HTTP yanıtlarını kontrol eder.
   # GitHub Pages özel header'ları uygulamıyorsa bu iş bilinçli olarak kırılır ve
