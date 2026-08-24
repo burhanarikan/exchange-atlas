@@ -23,7 +23,7 @@ jobs:
       # node açıkça kuruluyor: iki bağlaşım testi app.js'i node ile çalıştırıyor,
       # node yoksa unittest onları atlıyor ve atlanan test "OK" sayılıyor. Koşucu
       # imajı değişirse iki bekçi sessizce susardı.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - run: pip install -r requirements.txt
