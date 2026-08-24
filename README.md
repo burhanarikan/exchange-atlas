@@ -6,7 +6,7 @@ Excel tablosu yerine: Bölümünü yaz, ülkeni seç, kontenjanı ve dil şartı
 bakışta gör.
 
 **Alan adı:** exchangeatlas.org · **henüz yayında değil.** Depo şu an özel,
-GitHub Pages kapalı. Yayın için **24 Ağustos 2026** hedefleniyor.
+GitHub Pages kapalı. Yayın öncesi son adımlar `README-DEPLOY.md`'de yazılı.
 
 Şu an platformdaki üniversiteler:
 
@@ -16,8 +16,9 @@ GitHub Pages kapalı. Yayın için **24 Ağustos 2026** hedefleniyor.
 | Marmara · Marmara Üniversitesi | 785 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
 | ESOGÜ · Eskişehir Osmangazi Üniversitesi | 259 | Uluslararası İlişkiler Birimi'nin kamuya açık ikili anlaşma listesi |
 
-Üçü de **23 Ağustos 2026**'da indirildi. Hangi dosyadan üretildikleri, özetleri
-ve yapıları [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da yazılı.
+Kaynak çekim tarihleri kurum bazında değişir; her dosyanın tarihi, özeti ve yapısı
+[`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da yazılıdır. Üretilen JSON'un
+`generatedAt` alanı ise son veri üretim zamanını gösterir.
 
 Yeni üniversiteler eklenecek · katkıda bulunmak için [aşağıya](#katkı) bakın.
 
@@ -56,6 +57,13 @@ Yerelde bakmak için:
 ```bash
 python3 -m http.server 8765 --directory site
 ```
+
+### Yayın öncesi kontrol
+
+Yayın ortamını, gerçek HTTP response header'larını, HTTPS/DNS'i ve canlı smoke-test'i
+adım adım doğrulamak için [`README-DEPLOY.md`](README-DEPLOY.md) belgesini izleyin.
+GitHub Pages tarafında depo değişkeni `PAGES_ENABLED=true` yapılmadan yayın işi
+bilinçli olarak çalışmaz.
 
 ### Bilgi İşlem için güvenlik özeti
 

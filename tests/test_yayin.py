@@ -360,3 +360,31 @@ class TestKesfi(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ResponseHeaderYapilandirmasi(unittest.TestCase):
+    """Başlık destekleyen barındırmalarda kullanılacak güvenlik politikası."""
+
+    def test_headers_dosyasinda_gerekli_basliklar_var(self):
+        yol = ROOT / "site" / "_headers"
+        self.assertTrue(yol.exists(), "site/_headers yok; destekleyen edge katmanı için yapılandırma kaybolmuş.")
+        metin = yol.read_text(encoding="utf-8")
+        gerekli = {
+            "Content-Security-Policy": "frame-ancestors 'none'",
+            "X-Frame-Options": "DENY",
+            "X-Content-Type-Options": "nosniff",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+            "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+        }
+        for baslik, deger in gerekli.items():
+            with self.subTest(baslik=baslik):
+                self.assertIn(baslik + ":", metin)
+                self.assertIn(deger, metin)
+
+    def test_csp_headers_meta_politikayla_tutarlilik_gerektiriyor(self):
+        metin = (ROOT / "site" / "_headers").read_text(encoding="utf-8")
+        self.assertIn("default-src 'none'", metin)
+        self.assertIn("script-src 'self'", metin)
+        self.assertNotIn("unsafe-inline", metin)
+        self.assertNotIn("unsafe-eval", metin)

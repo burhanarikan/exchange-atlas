@@ -13,8 +13,9 @@ anlaşma listelerini öğrencinin arayabileceği bir listeye çeviriyor. Veriyi 
 Bu, bir sorumluluk doğuruyor: Okurken bazı kararlar vermek zorunda kalıyoruz ve o
 kararlar öğrencinin gördüğü şeyi değiştiriyor. **Hepsi burada yazılı.**
 
-Şu an platformda **üç kurum** var ve üçünün listesi de **23 Ağustos 2026'da**
-indirildi. Listenizi o tarihten sonra güncellediyseniz sayılar değişmiş olabilir.
+Şu an platformda **üç kurum** var. Kaynakların indirme tarihleri kurum bazında
+değişiyor ve her biri [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da
+yazılı. Listenizi ilgili tarihten sonra güncellediyseniz sayılar değişmiş olabilir.
 
 | Kurum | Anlaşma | Listenin biçimi |
 |---|---|---|

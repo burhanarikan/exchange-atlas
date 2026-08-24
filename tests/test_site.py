@@ -1134,3 +1134,50 @@ class KaldirmaSozuUcSayfada(unittest.TestCase):
                     eksik.append(f"{ad} · {parca!r} yok")
         self.assertEqual(eksik, [],
                          f"İletişim satırının açıklaması sayfalar arasında ayrışmış: {eksik}")
+
+
+class YayinaHazirlikIcerigi(unittest.TestCase):
+    """Yayına çıkmadan önce kullanıcıya görünen güven ve yardım metinleri."""
+
+    def test_ana_sayfa_javascript_kapaliyken_aciklama_sunar(self):
+        metin = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("<noscript>", metin)
+        self.assertIn("JavaScript", metin)
+        self.assertIn("universities", metin)
+
+    def test_anlasma_ekrani_okuma_rehberini_iki_dilde_tasiyor(self):
+        metin = (ROOT / "site" / "agreements.html").read_text(encoding="utf-8")
+        js = (ROOT / "site" / "app.js").read_text(encoding="utf-8")
+        self.assertIn('data-i18n="readingGuideTitle"', metin)
+        self.assertIn('data-i18n="readingGuideText"', metin)
+        self.assertIn("1L", metin)
+        self.assertIn("2YL", metin)
+        self.assertIn("starred degree", js)
+
+    def test_rehberdeki_maku_sayisi_uretilen_veriyle_eslesiyor(self):
+        unis = json.loads((ROOT / "site" / "universities.json").read_text(encoding="utf-8"))
+        maku = next(u for u in unis if u["id"] == "maku")
+        metin = (ROOT / "site" / "guide.html").read_text(encoding="utf-8")
+        self.assertIn(f"yayımlanan {maku['count']}", metin)
+        self.assertIn(f"{maku['count']} published", metin)
+
+    def test_rehber_silinen_kaydi_ve_gerekcesini_acikliyor(self):
+        metin = (ROOT / "site" / "guide.html").read_text(encoding="utf-8")
+        for parca in ("Powislanska Szkola Wyzsza", "Acil Yardım ve Afet Yönetimi",
+                      "not included", "listeye alınmamıştır"):
+            with self.subTest(parca=parca):
+                self.assertIn(parca, metin)
+
+    def test_dinamik_sonuclar_ekran_okuyucuya_duyuruluyor(self):
+        metin = (ROOT / "site" / "agreements.html").read_text(encoding="utf-8")
+        self.assertIn('id="resultCount" role="status" aria-live="polite"', metin)
+        self.assertIn('id="fieldNotice" role="status" aria-live="polite"', metin)
+        self.assertIn('aria-controls="filters" aria-expanded="false"', metin)
+
+    def test_tarih_etiketi_uretim_zamanini_soyluyor(self):
+        home = (ROOT / "site" / "home.js").read_text(encoding="utf-8")
+        app = (ROOT / "site" / "app.js").read_text(encoding="utf-8")
+        self.assertIn("Veri üretimi: {d}", home)
+        self.assertIn("Data generated: {d}", home)
+        self.assertIn("veri üretimi: ${d}", app)
+        self.assertIn("data generated: ${d}", app)

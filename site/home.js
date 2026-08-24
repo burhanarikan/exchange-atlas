@@ -12,7 +12,7 @@
   };
   var TPL = {
     stats: { tr: "{c} anlaşma · {u} partner üniversite · {n} ülke", en: "{c} agreements · {u} partner universities · {n} countries" },
-    updated: { tr: "Veri çekimi: {d}", en: "Data as of: {d}" }
+    updated: { tr: "Veri üretimi: {d}", en: "Data generated: {d}" }
   };
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (m) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]; }); }
   function apply() {

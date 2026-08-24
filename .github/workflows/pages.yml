@@ -108,3 +108,36 @@ jobs:
           path: site
       - id: deployment
         uses: actions/deploy-pages@v4
+
+  # LIVE_SITE_URL tanımlandığında deploy sonrası gerçek HTTP yanıtlarını kontrol eder.
+  # GitHub Pages özel header'ları uygulamıyorsa bu iş bilinçli olarak kırılır ve
+  # yayın ortamının bir edge/proxy katmanına ihtiyacı olduğu görünür.
+  live_check:
+    needs: deploy
+    if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true' && vars.LIVE_SITE_URL != ''
+    runs-on: ubuntu-latest
+    steps:
+      - name: canlı route ve güvenlik header denetimi
+        env:
+          LIVE_SITE_URL: ${{ vars.LIVE_SITE_URL }}
+        run: |
+          set -euo pipefail
+          base="${LIVE_SITE_URL%/}"
+          for path in \
+            '/' \
+            '/index.html' \
+            '/agreements.html?uni=maku' \
+            '/agreements.html?uni=marmara' \
+            '/agreements.html?uni=esogu' \
+            '/guide.html?uni=maku'; do
+            echo "--- ${base}${path}"
+            headers="$(curl --fail --silent --show-error --retry 8 --retry-delay 5 --retry-all-errors \
+              --max-time 30 -D - -o /dev/null "${base}${path}")"
+            printf '%s\n' "$headers" | grep -Eiq '^HTTP/.* 20[0-9]|^HTTP/.* 30[0-9]'
+            printf '%s\n' "$headers" | grep -Eiq "^content-security-policy:.*frame-ancestors[[:space:]]+'none'"
+            printf '%s\n' "$headers" | grep -Eiq '^x-frame-options:[[:space:]]*DENY'
+            printf '%s\n' "$headers" | grep -Eiq '^x-content-type-options:[[:space:]]*nosniff'
+            printf '%s\n' "$headers" | grep -Eiq '^referrer-policy:[[:space:]]*strict-origin-when-cross-origin'
+            printf '%s\n' "$headers" | grep -Eiq '^permissions-policy:'
+            printf '%s\n' "$headers" | grep -Eiq '^strict-transport-security:.*max-age=31536000'
+          done

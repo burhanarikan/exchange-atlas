@@ -12,7 +12,15 @@
       "sha256": "6f03926ab680e782cf354bdd63dc40acdfcda63141323d1c06042c0a71be225c",
       "boyut_bayt": 90239,
       "indirme_tarihi": "2026-07-07",
-      "kayit_sayisi": 468
+      "kayit_sayisi": 468,
+      "yayin_disi_kayitlar": [
+        {
+          "kurum_notu": "SİLDİM LİSTELERDEN",
+          "partner": "Powislanska Szkola Wyzsza",
+          "bolum": "Acil Yardım ve Afet Yönetimi",
+          "gerekce": "Kaynak Excel'de satır üstü çizili ve kurum tarafından silindiği belirtilmiş."
+        }
+      ]
     },
     {
       "id": "marmara",

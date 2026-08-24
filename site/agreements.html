@@ -104,12 +104,17 @@
            yanlış olurdu. -->
       <p class="source-notice" id="sourceNotice" hidden></p>
 
+      <details class="reading-guide">
+        <summary data-i18n="readingGuideTitle">Alanları nasıl okumalı?</summary>
+        <p data-i18n="readingGuideText">Öğrenim, staj ve personel kontenjanları ayrı gösterilir. 1L lisans, 2YL yüksek lisans, D doktora anlamına gelir; yıldızlı derece rozetleri ortak kontenjanı gösterir. Geçerlilik tarihi kaynakta yazdığı biçimde verilir.</p>
+      </details>
+
       <div class="main-top">
         <div class="search-box">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
           <input id="search" type="search" autocomplete="off" data-i18n-ph="searchPlaceholder" placeholder="Bölüm, üniversite veya ülke ara">
         </div>
-        <button class="filter-trigger" id="filterTrigger">
+        <button type="button" class="filter-trigger" id="filterTrigger" aria-controls="filters" aria-expanded="false">
           <span data-i18n="filterBtn">⚙ Filtrele</span>
           <span class="badge-n" id="filterCount" hidden>0</span>
         </button>
@@ -118,10 +123,10 @@
       <div class="active-chips" id="activeChips"></div>
 
       <div class="result-row" id="resultRow">
-        <span class="result-count" id="resultCount"></span>
+        <span class="result-count" id="resultCount" role="status" aria-live="polite"></span>
         <button class="clear-inline" id="clearBtn" hidden data-i18n="clear">Temizle</button>
       </div>
-      <p class="field-notice" id="fieldNotice" hidden></p>
+      <p class="field-notice" id="fieldNotice" role="status" aria-live="polite" hidden></p>
 
       <div class="card-grid" id="grid"></div>
 

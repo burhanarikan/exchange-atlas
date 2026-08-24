@@ -73,9 +73,11 @@ const I18N = {
     srcNoticeClean: 'Bu liste {0} tarafından yayımlanan listeden derlendi. Gösterim biçimi değişti, veriye dokunulmadı. Resmî başvuru için <a href="{2}" target="_blank" rel="noopener">kurumun kendi listesine</a> bakın · <a href="{3}" target="_blank" rel="noopener">nasıl okuduğumuz</a>.',
     study: "Öğrenim", intern: "Staj", personnel: "Personel",
     website: "Web sitesi", langLabel: "Dil",
+    readingGuideTitle: "Alanları nasıl okumalı?",
+    readingGuideText: "Öğrenim, staj ve personel kontenjanları ayrı gösterilir. 1L lisans, 2YL yüksek lisans, D doktora anlamına gelir; yıldızlı derece rozetleri ortak kontenjanı gösterir. Geçerlilik tarihi kaynakta yazdığı biçimde verilir.",
     loadMore: (a, b) => `Daha fazla göster (${a} / ${b})`,
     stats: { anlasma: "anlaşma", ulke: "ülke", uni: "üniversite", alan: "alan" },
-    footer: (d, credit) => `${credit} · Erasmus+ ikili anlaşma listesi (veri çekimi: ${d}).`,
+    footer: (d, credit) => `${credit} · Erasmus+ ikili anlaşma listesi (veri üretimi: ${d}).`,
     independence: `<strong>Exchange Atlas bağımsız bir platformdur; resmî bir üniversite hizmeti değildir.</strong> Veri, üniversitelerin kamuya açık listelerinden derlenir ve o listelerle birebir aynı değildir: Okurken verdiğimiz kararlar kartlarda ⓘ ile işaretlidir, ayrıca hata da içerebilir. Bağlayıcı olan kurumun kendi listesidir. Resmî başvuru için üniversitenizin Erasmus veya uluslararası ilişkiler birimine danışın.`,
   },
   en: {
@@ -109,9 +111,11 @@ const I18N = {
     srcNoticeClean: 'This list is compiled from the list published by {0}. The presentation changed; the data did not. For official applications see <a href="{2}" target="_blank" rel="noopener">the institution\'s own list</a> · <a href="{3}" target="_blank" rel="noopener">how we read it</a>.',
     study: "Study", intern: "Traineeship", personnel: "Staff",
     website: "Website", langLabel: "Language",
+    readingGuideTitle: "How should I read these fields?",
+    readingGuideText: "Study, traineeship and staff quotas are shown separately. 1L means bachelor's, 2YL master's and D doctorate; starred degree badges indicate shared quotas. Validity is shown as written in the source.",
     loadMore: (a, b) => `Show more (${a} / ${b})`,
     stats: { anlasma: "agreements", ulke: "countries", uni: "universities", alan: "fields" },
-    footer: (d, credit) => `${credit} — Erasmus+ bilateral agreements list (data as of: ${d}).`,
+    footer: (d, credit) => `${credit} — Erasmus+ bilateral agreements list (data generated: ${d}).`,
     independence: `<strong>Exchange Atlas is an independent platform, not an official university service.</strong> Data is compiled from universities' publicly available lists and is not identical to them: the decisions we made while reading are marked with ⓘ on each card, and errors are possible. The institution's own list is the authoritative one. For official applications, contact your university's Erasmus or international relations office.`,
   },
 };
@@ -308,8 +312,16 @@ function bindControls() {
     b.addEventListener("click", () => setLang(b.dataset.lang)));
 }
 
-function openSheet() { document.body.classList.add("sheet-open"); $("#sheetBackdrop").hidden = false; }
-function closeSheet() { document.body.classList.remove("sheet-open"); $("#sheetBackdrop").hidden = true; }
+function openSheet() {
+  document.body.classList.add("sheet-open");
+  $("#sheetBackdrop").hidden = false;
+  $("#filterTrigger").setAttribute("aria-expanded", "true");
+}
+function closeSheet() {
+  document.body.classList.remove("sheet-open");
+  $("#sheetBackdrop").hidden = true;
+  $("#filterTrigger").setAttribute("aria-expanded", "false");
+}
 
 function clearAll() {
   state.q = ""; state.qWords = [];
