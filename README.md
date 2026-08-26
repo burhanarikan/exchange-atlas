@@ -212,3 +212,19 @@ Açık kaynak · kod [MIT](LICENSE), veri ve içerik ayrı koşullarda
 Kapsam dışında kalanlar ve sebepleri [`NOTICE.md`](NOTICE.md)'de: Yazı tipleri
 (SIL OFL 1.1 altında, MIT altında yeniden lisanslanamaz) ve üniversite verisi
 (derleme bizim, anlaşma bilgilerinin kendisi değil).
+
+
+## Ürün sözleşmesi ve bakım durumu
+
+| Alan | Güncel durum |
+|---|---|
+| Ürün durumu | Yayında; canonical site [exchangeatlas.org](https://exchangeatlas.org) adresidir. |
+| Kurulum / çalıştırma | `site/` içeriğini statik bir sunucuya kopyalayın. Yerel önizleme için `python3 -m http.server 8765 --directory site` kullanın. |
+| Veri üretimi | Kaynak verileri yeniden çekmek ve JSON üretmek için `python3 scripts/build_data.py --pull` çalıştırılır. Kaynak künyeleri `site/kaynak-kunyesi.json` içinde tutulur. |
+| Kalite kapısı | `python3 -m pytest`; yayın öncesi ayrıca `README-DEPLOY.md` adımlarını ve `git diff --check` kontrolünü uygulayın. |
+| Desteklenen dağıtım | Modern tarayıcı + herhangi bir statik hosting; uygulama sunucusu, veritabanı ve runtime API’si gerekmez. |
+| Gizlilik / güvenlik | Çerezsiz ve izleme içermeyen, çalışma anında dış istek yapmayan salt okunur site. Güvenlik bildirimleri [`SECURITY.md`](SECURITY.md) üzerinden yapılır. |
+| Bilinen sınırlar | Veri güncelliği, kurum bazlı kaynak tarihleri ve mevcut üniversite kapsamı kaynak dosyalarına bağlıdır; canlı veri toplama runtime’da yapılmaz. |
+| Lisans | Uygulama kodu [`LICENSE`](LICENSE) ile lisanslanır; veri kaynaklarının kendi atıf ve kullanım koşulları ayrıca geçerlidir. |
+
+Bu tablo, repository’nin ürün ve operasyon sözleşmesidir. Canlı adres, veri üretim yöntemi, test komutu veya desteklenen hosting modeli değişirse README ile [`README-DEPLOY.md`](README-DEPLOY.md) birlikte güncellenmelidir.
