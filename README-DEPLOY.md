@@ -108,6 +108,42 @@ grep -RInE 'https?://|fetch\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|im
 
 Resmî üniversite bağlantıları kullanıcı tıklamasıyla açılan dış bağlantılar olabilir; sayfa açılışında otomatik dış istek olmamalıdır. Tarayıcı geliştirici araçlarında Network paneli açıkken ana sayfa, üç anlaşma sayfası ve MAKÜ rehberi yenilenir; üçüncü taraf otomatik istek veya mixed-content uyarısı bulunmamalıdır.
 
+### 6.1 Yayın ortamının kendi enjeksiyonu
+
+Yukarıdaki komutlar **depodaki** dosyalara bakar. Bu yeterli değil: Yayın ortamı sayfaya kendi betiğini ekleyebilir ve depoya bakan hiçbir denetim onu göremez. Bir kez oldu · Cloudflare Web Analytics beacon'ı her sayfaya enjekte ediliyordu.
+
+Kritik ayrıntı, denetimin nasıl yazılacağını belirliyor: **Enjeksiyon yalnız tarayıcı gibi görünen isteklere yapılıyor.**
+
+```
+depodaki index.html    : 8507 bayt
+düz curl ile gelen     : 8507 bayt   · temiz
+tarayıcı başlıklarıyla : 8866 bayt   · +359 bayt izleme betiği
+```
+
+**Tetikleyen başlık `Accept`, `User-Agent` değil.** Tek tek ölçüldü:
+
+| İstek | Sonuç |
+|---|---|
+| hiç başlık yok | temiz |
+| sadece `User-Agent` | temiz · **sezgiye aykırı olan bu** |
+| sadece `Accept: text/html,...` | izleme var |
+| ikisi birden | izleme var |
+
+Bu ayrım yazılı, çünkü yanlış bilinirse denetim **sessizce körleşir**: "User-Agent yeter" diye `Accept` kaldırılırsa komut temiz sonuç verir ve izleme fark edilmeden geri gelir. `live_check` işindeki adım bu yüzden ikisini birden gönderiyor · `Accept` zorunlu, `User-Agent` gerçek bir tarayıcıya benzemek için.
+
+Elle bakmak gerekirse:
+
+```bash
+curl -s \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36' \
+  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+  https://exchangeatlas.org/ | grep -Eio '<script[^>]+src="https?://[^"]*'
+```
+
+Çıktı boş olmalı. Boş değilse kapatılacağı yer: Cloudflare panosu → alan adı → **Analytics & Logs → Web Analytics** (ya da Workers & Pages → exchange-atlas → Settings → Web Analytics).
+
+Not: CSP (`script-src 'self'`) böyle bir betiği zaten bloklar, yani ziyaretçinin adresi üçüncü tarafa gitmez. Ama o zaman gizlilik sözü **tek bir satıra** bağlı kalır: CSP bir gün gevşetilirse izleme sessizce açılır. Beacon'ın kaynağında kapatılması, sözü iki katmanda birden tutuyor.
+
 ## 7. Manuel smoke-test
 
 Yayınlanan adres üzerinde masaüstü ve mobil görünümde şu akışlar tamamlanır:
