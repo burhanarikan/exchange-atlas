@@ -142,3 +142,79 @@ jobs:
             printf '%s\n' "$headers" | grep -Eiq '^permissions-policy:'
             printf '%s\n' "$headers" | grep -Eiq '^strict-transport-security:.*max-age=31536000'
           done
+
+      # ÜÇÜNCÜ TARAF İZLEME DENETİMİ · en pahalı boşluk buydu.
+      #
+      # README ve SECURITY.md sitenin "analitik/izleme servisi çalıştırmadığını"
+      # ve "çalışma anında dış istek yapmadığını" AÇIKÇA yazıyor. Depo tarafında
+      # bunun bir bekçisi var (tests/test_site.py · DisIstekYasagi). Ama o bekçi
+      # yalnız DEPODAKİ dosyalara bakıyor ve buradaki sorun depoda değildi:
+      # Yayın ortamı, sayfaya kendi izleme betiğini KENDİSİ ekliyordu.
+      #
+      # Ölçüldü · sayı sayıyla:
+      #   depodaki index.html        : 8507 bayt
+      #   düz curl ile gelen         : 8507 bayt  · temiz
+      #   tarayıcı User-Agent ile    : 8866 bayt  · +359 bayt izleme betiği
+      #
+      # YANİ ENJEKSİYON YALNIZ TARAYICI GİBİ GÖRÜNEN İSTEKLERE YAPILIYOR.
+      # Yukarıdaki denetimler düz curl kullanıyor, dolayısıyla bu betiği
+      # HİÇBİR ZAMAN göremezlerdi · bekçi vardı ama tam da bu duruma kördü.
+      # Bu yüzden aşağıdaki istek bilerek tarayıcı başlıklarıyla gidiyor.
+      #
+      # Şu an CSP (`script-src 'self'`) betiği bloklıyor, yani ziyaretçinin
+      # adresi üçüncü tarafa gitmiyor. Ama gizlilik iddiası TEK BİR SATIRA
+      # bağlı kalmış oluyor: CSP bir gün gevşetilirse izleme sessizce açılır
+      # ve kimse fark etmez. Denetim, iddianın yayın ortamında da doğru
+      # kalmasını sağlıyor.
+      - name: canlı sayfada üçüncü taraf izleme yok
+        env:
+          LIVE_SITE_URL: ${{ vars.LIVE_SITE_URL }}
+        run: |
+          set -euo pipefail
+          base="${LIVE_SITE_URL%/}"
+          TARAYICI_UA='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
+          kusur=0
+          for path in '/' '/agreements?uni=maku' '/guide?uni=maku'; do
+            echo "--- ${base}${path}"
+            govde="$(curl --fail --silent --show-error --retry 8 --retry-delay 5 \
+              --retry-all-errors --max-time 30 \
+              -H "User-Agent: ${TARAYICI_UA}" \
+              -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
+              "${base}${path}")"
+
+            # Kapsam adres dizesine değil, İSTEK BAŞLATAN ETİKETE bakıyor ·
+            # tests/test_site.py'deki DisIstekYasagi ile aynı ayrım. Kullanıcının
+            # tıkladığı <a href="https://..."> ihlal DEĞİL; sayfa açılırken
+            # kendiliğinden giden <script src>, <link rel=stylesheet>, <iframe>
+            # ihlal.
+            if printf '%s' "$govde" | grep -Eiq '<script[^>]+src=["'"'"']https?://'; then
+              echo "İHLAL: sayfada dış kaynaklı <script src> var"
+              printf '%s' "$govde" | grep -Eio '<script[^>]+src=["'"'"']https?://[^"'"'"']*' | head -5
+              kusur=1
+            fi
+            if printf '%s' "$govde" | grep -Eiq '<iframe[^>]+src=["'"'"']https?://'; then
+              echo "İHLAL: sayfada dış kaynaklı <iframe> var"
+              kusur=1
+            fi
+          done
+          if [ "$kusur" -ne 0 ]; then
+            echo ""
+            echo "Canlı sayfaya üçüncü taraf betiği ENJEKTE EDİLİYOR."
+            echo ""
+            echo "Bu, README.md ve SECURITY.md'de yazılı iki iddiayı birden çiğniyor:"
+            echo "\"analitik/izleme servisi çalıştırmaz\" ve \"çalışma anında dış istek"
+            echo "yapmaz\". Depo temiz olabilir · bu betik yayın ortamı tarafından"
+            echo "ekleniyor, dolayısıyla depoya bakan bekçiler onu göremiyor."
+            echo ""
+            echo "Kaynağı Cloudflare Web Analytics ise kapatılacağı yer:"
+            echo "  Cloudflare panosu -> ilgili alan adı -> Analytics & Logs ->"
+            echo "  Web Analytics -> exchangeatlas.org -> beacon'ı kapatın."
+            echo "  (Pages projesinde de olabilir: Workers & Pages -> exchange-atlas"
+            echo "   -> Settings -> Web Analytics.)"
+            echo ""
+            echo "Ziyaretçi sayısı gerekiyorsa sunucu tarafı Cloudflare trafik özeti"
+            echo "kullanılabilir · ziyaretçinin tarayıcısına hiçbir şey yüklemiyor ve"
+            echo "sitedeki gizlilik sözünü bozmuyor."
+            exit 1
+          fi
+          echo "Temiz: denetlenen sayfaların hiçbirinde dış kaynaklı betik yok."
