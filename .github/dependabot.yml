@@ -6,6 +6,39 @@ updates:
       interval: monthly
     open-pull-requests-limit: 5
 
+    # MAJOR YÜKSELTMELER BİLEREK ALINMIYOR · karar burada yazılı olsun diye.
+    #
+    # Dependabot altı PR açtı, altısı da major yükseltmeydi ve altısı da
+    # merge edilmeden kapatıldı:
+    #
+    #   #1 checkout             4 → 7
+    #   #2 setup-python         5 → 7
+    #   #3 upload-pages-artifact 3 → 5
+    #   #4 configure-pages      5 → 6
+    #   #5 setup-node           4 → 7
+    #   #6 deploy-pages         4 → 5
+    #
+    # Karar hiçbir yere yazılmamıştı, dolayısıyla dependabot aynı altı PR'ı
+    # her ay yeniden açacaktı ve her ay yeniden kapatılacaklardı. Tekrar eden
+    # gürültünün asıl bedeli zaman değil: Kapatmak refleks hâline geldiğinde,
+    # gerçekten bakılması gereken bir PR da aynı refleksle kapanıyor.
+    #
+    # NEDEN MAJOR ALINMIYOR: Bu depoda yayın yolu tek bir workflow'a bağlı ve
+    # kullanılan altı action da bakımlı sürümlerde. Major bir yükseltmenin
+    # getirdiği tek somut şey, yayın hattını yeniden doğrulama yükü.
+    #
+    # NE GELMEYE DEVAM EDİYOR: minor ve patch. Yani hata düzeltmeleri ve
+    # küçük iyileştirmeler normal akışta gelmeyi sürdürüyor · durdurulan
+    # yalnız major.
+    #
+    # BİR MAJOR GEREKİRSE: Bu `ignore` bloğu geçici olarak kaldırılır ya da
+    # ilgili `uses:` satırı elle yükseltilip yayın hattı doğrulanır. Güvenlik
+    # gerekçesiyle bir major şart olursa da yol budur · `ignore` o durumu
+    # kendiliğinden çözmüyor, karar insanda kalıyor.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
   - package-ecosystem: pip
     directory: /
     schedule:
