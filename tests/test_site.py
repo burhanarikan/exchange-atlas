@@ -1447,6 +1447,41 @@ class KaldirmaSozuUcSayfada(unittest.TestCase):
                          f"İletişim satırının açıklaması sayfalar arasında ayrışmış: {eksik}")
 
 
+class KullanilmayanGorsel(unittest.TestCase):
+    """Yayın klasöründe hiçbir sayfanın kullanmadığı görsel durmamalı.
+
+    Dört OG görseli vardı ve DÖRDÜ DE BİREBİR AYNI DOSYAYDI (aynı md5).
+    İkisi · `og-cover.png` ve `og-cover-v2.png` · hiçbir commit'te hiçbir
+    sayfa tarafından referans edilmemişti; depoya girip orada kalmışlardı.
+    Toplam 257 KB ölü ağırlık.
+
+    Sürüm numaralı isim BİLEREK duruyor ve gerekçesi var: LinkedIn OG
+    görselini adrese göre önbelleğe alıyor, yani görsel değiştiğinde yeni
+    bir adres gerekiyor. Bu bekçi o kullanımı engellemiyor · yalnız
+    kullanılmayanın birikmesini engelliyor.
+
+    Silme kararı ölçüldü, tahmin edilmedi: `git log --all -p` ile bakıldı,
+    iki dosya hiçbir sayfada hiç geçmemişti. Yani hiçbir tarayıcı onları OG
+    görseli olarak görmedi ve silinmeleri paylaşılmış hiçbir önizlemeyi
+    bozmuyor.
+    """
+
+    GORSEL = (".png", ".jpg", ".jpeg", ".svg", ".webp", ".gif")
+    METIN = (".html", ".js", ".css", ".txt", ".xml", ".json")
+
+    def test_her_gorsel_bir_yerden_referans_ediliyor(self):
+        kok = ROOT / "site"
+        govde = "\n".join(y.read_text(encoding="utf-8", errors="ignore")
+                          for y in sorted(kok.rglob("*"))
+                          if y.suffix in self.METIN)
+        oksuz = [y.name for y in sorted(kok.rglob("*"))
+                 if y.suffix in self.GORSEL and y.name not in govde]
+        self.assertEqual(oksuz, [],
+                         f"Hiçbir sayfanın kullanmadığı görsel: {oksuz}\n"
+                         f"Ya bir sayfadan referans edilmeli ya da silinmeli · "
+                         f"yayınlanan her dosya indirilebilir durumda duruyor.")
+
+
 class YayinaHazirlikIcerigi(unittest.TestCase):
     """Yayına çıkmadan önce kullanıcıya görünen güven ve yardım metinleri."""
 
