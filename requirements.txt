@@ -1,3 +1,19 @@
 # scripts/build_data.py Excel dosyasını okumak için kullanıyor.
 # Testler build_data'yı içe aktardığından CI'da da gerekiyor.
-openpyxl
+#
+# ÜST SINIR VAR VE GEREKÇESİ ÖLÇÜLDÜ.
+#
+# Sürüm hiç yazılmıyordu, yani CI her koşuda o günün en güncel openpyxl'ini
+# kuruyordu. Bunun görünmeyen bedeli şu: Kırıcı bir 4.0 çıktığı gün, bu
+# depoda HİÇBİR ŞEY DEĞİŞMEDEN yayın hattı kırılırdı. Kırılma da yanıltıcı
+# görünürdü · son commit masum bir belge değişikliği olurdu ve hata onu
+# işaret ederdi.
+#
+# Alt sınır (3.1.5) sınanmış taban, üst sınır (<4) sessiz major geçişini
+# durduruyor. Yama ve küçük sürümler serbest kalıyor · .github/dependabot.yml
+# içindeki politikayla aynı çizgi: Major insan kararı, gerisi normal akış.
+#
+# 4.x'e geçilecekse: Sınır elle yükseltilir, `python3 -m unittest discover
+# -s tests` koşturulur ve `lokal/` altındaki kaynak tabloyla üretim bir kez
+# elle doğrulanır (README-DEPLOY.md).
+openpyxl>=3.1.5,<4
