@@ -966,23 +966,39 @@ def write_sitemap(registry):
     gün hiçbir şey kırılmazdı: Site çalışmaya devam eder, yalnız yeni sayfalar
     aranamaz olurdu. Kayıttan üretmek o boşluğu tümüyle kaldırıyor.
     """
-    yollar = ["/", "/index.html"]
+    # Adresler UZANTISIZ · ölçüldü, kanonik yayın `.html`'i uzantısıza 308
+    # ile yönlendiriyor:
+    #
+    #   /agreements.html?uni=maku  →  308  →  /agreements?uni=maku
+    #
+    # Yani sitemap'teki her adres bir yönlendirmeydi ve arama motoruna
+    # sayfanın gerçek adresi hiç bildirilmiyordu. Giriş sayfası da öyleydi:
+    # `/index.html` → 308 → `/`, üstelik sayfanın kendi `canonical`'ı zaten
+    # `/` diyordu · sitemap ile sayfa birbirini yalanlıyordu.
+    #
+    # Adresler mutlak ve `ALAN_ADI` ile üretiliyor, yani bu liste KANONİK
+    # YAYINI tarif ediyor · deponun herhangi bir statik sunucuya kopyalanmış
+    # hâlini değil. Uzantısız biçim o yayının gerçek biçimi.
+    yollar = ["/"]
     for uni in registry:
-        yollar.append(f"/agreements.html?uni={uni['id']}")
+        yollar.append(f"/agreements?uni={uni['id']}")
         if uni.get("hasGuide"):
-            yollar.append(f"/guide.html?uni={uni['id']}")
+            yollar.append(f"/guide?uni={uni['id']}")
 
     bugun = datetime.now().date().isoformat()
+    # `if y != "/"` KALDIRILDI. Giriş sayfası listeden atılıp yerine
+    # `/index.html` konuyordu; o adres de yönlendiriliyordu. Artık giriş
+    # sayfası gerçek adresiyle bildiriliyor.
     satirlar = "\n".join(
         f"  <url><loc>{ALAN_ADI}{y.replace('&', '&amp;')}</loc>"
         f"<lastmod>{bugun}</lastmod></url>"
-        for y in yollar if y != "/"
+        for y in yollar
     )
     (SITE / "sitemap.xml").write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
         f"{satirlar}\n</urlset>\n", encoding="utf-8")
-    print(f"sitemap.xml: {len(yollar) - 1} adres", file=sys.stderr)
+    print(f"sitemap.xml: {len(yollar)} adres", file=sys.stderr)
 
 
 def check_guide_links():

@@ -29,12 +29,12 @@ Ayrıntısı `KAYNAK.md` belgesinde.
 
 ## Sayfalar
 
-- [Üniversite seçimi](https://exchangeatlas.org/index.html): Platformdaki
+- [Üniversite seçimi](https://exchangeatlas.org/): Platformdaki
   kurumlar ve anlaşma sayıları
-- [MAKÜ anlaşma listesi](https://exchangeatlas.org/agreements.html?uni=maku): Burdur Mehmet Akif Ersoy Üniversitesi · 468 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
-- [Marmara anlaşma listesi](https://exchangeatlas.org/agreements.html?uni=marmara): Marmara Üniversitesi · 785 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
-- [ESOGÜ anlaşma listesi](https://exchangeatlas.org/agreements.html?uni=esogu): Eskişehir Osmangazi Üniversitesi · 259 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
-- [MAKÜ başvuru rehberi](https://exchangeatlas.org/guide.html?uni=maku): Öğrencinin izleyeceği adımlar ve kurumun ilgili birimine bağlantılar
+- [MAKÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=maku): Burdur Mehmet Akif Ersoy Üniversitesi · 468 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [Marmara anlaşma listesi](https://exchangeatlas.org/agreements?uni=marmara): Marmara Üniversitesi · 785 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [ESOGÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=esogu): Eskişehir Osmangazi Üniversitesi · 259 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [MAKÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=maku): Öğrencinin izleyeceği adımlar ve kurumun ilgili birimine bağlantılar
 
 ## Sınırlar
 

@@ -144,6 +144,22 @@
     });
   });
 
+  // ?uni= ADRESİ KENDİ KANONİĞİNİ BİLDİRİYOR.
+  //
+  // Sayfa tek bir HTML dosyası, üç üniversiteyi de o dosya gösteriyor.
+  // Dolayısıyla üç adres de aynı sabit `canonical`'ı taşıyordu ve arama
+  // motoruna "bu üçü aynı sayfa" demiş oluyorduk · sitemap ise onları ayrı
+  // ayrı bildiriyordu. İki bildirim birbirini yalanlıyordu ve kaybeden
+  // kurumların anlaşma sayfaları oluyordu: Üçü tek adrese indirgenir,
+  // ikisi indekslenmezdi.
+  //
+  // Alan adı BURADA TEKRAR YAZILMIYOR · etiketin kendi değeri okunup
+  // üzerine parametre ekleniyor, yani adres tek yerde (HTML'de) duruyor.
+  function kanonikBildir(id) {
+    var k = document.querySelector('link[rel="canonical"]');
+    if (k) k.href = k.href.split("?")[0] + "?uni=" + encodeURIComponent(id);
+  }
+
   fetch("universities.json")
     .then(function (r) { return r.json(); })
     .then(function (unis) {
@@ -151,6 +167,7 @@
       UNI = UNI_ID
         ? unis.find(function (u) { return u.id === UNI_ID; })
         : (unis.find(function (u) { return u.hasGuide; }) || unis[0]);
+      if (UNI) kanonikBildir(UNI.id);
       apply();
     })
     .catch(function () {

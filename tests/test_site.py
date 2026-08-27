@@ -204,9 +204,13 @@ class MarkaAdi(unittest.TestCase):
                 self.assertIn('og:image:alt', self.sayfa(ad))
 
     def test_alt_sayfalar_kanonik_og_ve_twitter_meta_tasiyor(self):
+        # Adresler UZANTISIZ · kanonik yayın `.html`'i uzantısıza 308 ile
+        # yönlendiriyor, yani `.html` biçimi sayfanın gerçek adresi değil.
+        # Yönlendirilen bir adresi `canonical` diye bildirmek, arama motoruna
+        # var olmayan bir adresi asıl adres diye göstermek demekti.
         beklenen = {
-            "agreements.html": "https://exchangeatlas.org/agreements.html",
-            "guide.html": "https://exchangeatlas.org/guide.html",
+            "agreements.html": "https://exchangeatlas.org/agreements",
+            "guide.html": "https://exchangeatlas.org/guide",
         }
         for ad, url in beklenen.items():
             t = self.sayfa(ad)
@@ -218,8 +222,8 @@ class MarkaAdi(unittest.TestCase):
     def test_linkedin_aliasi_v4_ve_noindex_tasiyor(self):
         t = self.sayfa("linkedin.html")
         self.assertIn('<meta name="robots" content="noindex,follow">', t)
-        self.assertIn('<meta property="og:url" content="https://exchangeatlas.org/linkedin.html">', t)
-        self.assertIn('<link rel="canonical" href="https://exchangeatlas.org/linkedin.html">', t)
+        self.assertIn('<meta property="og:url" content="https://exchangeatlas.org/linkedin">', t)
+        self.assertIn('<link rel="canonical" href="https://exchangeatlas.org/linkedin">', t)
         self.assertIn('https://exchangeatlas.org/og-cover-v4.png', t)
         self.assertNotIn('https://exchangeatlas.org/og-cover-v3.png', t)
 
@@ -720,15 +724,18 @@ class Sitemap(unittest.TestCase):
 
         eksik = []
         for u in uni:
-            if f"agreements.html?uni={u['id']}" not in harita:
+            if f"agreements?uni={u['id']}" not in harita:
                 eksik.append(f"{u['id']} → anlaşma sayfası")
-            if u.get("hasGuide") and f"guide.html?uni={u['id']}" not in harita:
+            if u.get("hasGuide") and f"guide?uni={u['id']}" not in harita:
                 eksik.append(f"{u['id']} → rehber sayfası")
         self.assertEqual(eksik, [],
                          f"sitemap.xml bu sayfaları taşımıyor: {eksik}. "
                          f"O sayfalar aramalarda çıkmaz ve hiçbir hata görünmez.")
 
-        self.assertIn("index.html", harita, "sitemap.xml giriş sayfasını taşımıyor.")
+        # Giriş sayfası `/index.html` diye bildiriliyordu; o adres de 308 ile
+        # `/`'a yönleniyor ve sayfanın kendi canonical'ı zaten `/` diyordu.
+        self.assertIn("<loc>https://exchangeatlas.org/</loc>", harita,
+                      "sitemap.xml giriş sayfasını gerçek adresiyle taşımıyor.")
 
     def test_rehbersiz_universitenin_rehberi_listelenmiyor(self):
         """Yanlış alarmın tersi: Olmayan bir sayfayı bildirmek de hata.
@@ -738,7 +745,7 @@ class Sitemap(unittest.TestCase):
         """
         harita = (ROOT / "site" / "sitemap.xml").read_text(encoding="utf-8")
         fazla = [u["id"] for u in self.kayit()
-                 if not u.get("hasGuide") and f"guide.html?uni={u['id']}" in harita]
+                 if not u.get("hasGuide") and f"guide?uni={u['id']}" in harita]
         self.assertEqual(fazla, [],
                          f"Rehberi olmayan üniversitenin rehber sayfası sitemap'te: {fazla}")
 
@@ -1105,7 +1112,7 @@ class LlmsTxtKapsami(unittest.TestCase):
         uni = self.kayit()
         self.assertGreater(len(uni), 0, "universities.json boş: denetim boşa dönüyor.")
         eksik = [u["id"] for u in uni
-                 if f"agreements.html?uni={u['id']}" not in metin]
+                 if f"agreements?uni={u['id']}" not in metin]
         self.assertEqual(eksik, [],
                          f"llms.txt bu üniversitelerin anlaşma sayfasını "
                          f"listelemiyor: {eksik}\nYeni üniversite eklendiğinde "
@@ -1115,10 +1122,74 @@ class LlmsTxtKapsami(unittest.TestCase):
         """Ters yön · listeden çıkarılan bir kurum llms.txt'de kalmamalı."""
         metin = (ROOT / "site" / "llms.txt").read_text(encoding="utf-8")
         kayitli = {u["id"] for u in self.kayit()}
-        gecen = set(re.findall(r"agreements\.html\?uni=([a-z0-9-]+)", metin))
+        # Kalıp adres biçimiyle birlikte güncellendi. Güncellenmeseydi test
+        # hiçbir şey bulamaz, boş küme boş kümeye eşit çıkar ve BOŞUNA
+        # GEÇERDİ · susan bir bekçi, olmayan bir bekçiden daha kötü.
+        gecen = set(re.findall(r"agreements\?uni=([a-z0-9-]+)", metin))
         fazla = gecen - kayitli
         self.assertEqual(fazla, set(),
                          f"llms.txt kayıtlı olmayan üniversite gösteriyor: {fazla}")
+
+
+class KanonikAdresBicimi(unittest.TestCase):
+    """Arama motorlarına bildirilen adresler YÖNLENDİRİLMEYEN adresler olmalı.
+
+    Kanonik yayın `.html` uzantısını uzantısıza 308 ile yönlendiriyor:
+
+        /agreements.html?uni=maku  →  308  →  /agreements?uni=maku
+
+    Site bunu bilmeden kurulmuştu ve sonuç şuydu: `sitemap.xml`'deki beş
+    adresin beşi de yönlendirmeydi, `canonical` etiketleri yönlendirilen bir
+    adresi asıl adres diye gösteriyordu, `llms.txt` de aynı biçimi taşıyordu.
+    Hiçbiri hata vermiyordu · yalnız sayfalar doğru indekslenmiyordu.
+
+    Bu bekçi tek tek dosyalara değil, **bildirim sınıfının tamamına** bakıyor:
+    Yayın alan adıyla birlikte yazılan hiçbir adres `.html` taşımamalı.
+
+    Ayrım önemli, yoksa yanlış alarm verir:
+
+      BİLDİRİM   → canonical, og:url, sitemap, llms.txt · mutlak adres,
+                   "bu sayfanın adresi budur" diyor. `.html` ihlal.
+      İÇ BAĞLANTI → href="agreements.html" · göreli, sayfadan sayfaya
+                   geçiş. `.html` DOĞRU: Depo herhangi bir statik sunucuya
+                   kopyalanabiliyor (README'deki yerel önizleme dahil) ve
+                   orada uzantısız adres YOK. Bir yönlendirme bedeli var,
+                   taşınabilirlik karşılığında kabul edildi.
+    """
+
+    def test_bildirilen_adreslerde_html_uzantisi_yok(self):
+        ALAN = "exchangeatlas.org"
+        bulgu = []
+        for yol in sorted((ROOT / "site").glob("*.*")):
+            if yol.suffix not in (".html", ".xml", ".txt", ".js"):
+                continue
+            for adres in re.findall(rf"https?://{re.escape(ALAN)}/\S*", yol.read_text(encoding="utf-8")):
+                temiz = adres.rstrip('">\'),:;')
+                if re.search(r"\.html(\?|$)", temiz):
+                    bulgu.append(f"{yol.name} · {temiz}")
+        self.assertEqual(sorted(set(bulgu)), [],
+                         f"Yayın adresiyle birlikte `.html` bildirilmiş: "
+                         f"{sorted(set(bulgu))}\n"
+                         f"Bu adresler 308 ile uzantısıza yönleniyor; "
+                         f"bildirimlerde yönlendirilmeyen biçim kullanılmalı.")
+
+    def test_sitemap_ve_canonical_ayni_bicimi_kullaniyor(self):
+        """İki bildirim birbirini yalanlamamalı · asıl kusur buydu.
+
+        `sitemap.xml` üç üniversiteyi ayrı adres diye bildiriyordu, sayfa ise
+        üçünde de aynı sabit canonical'ı taşıyordu · yani "bunlar aynı sayfa"
+        diyordu. Arama motoru için bu, üç kurumun listesini tek adrese
+        indirgemek demek.
+        """
+        harita = (ROOT / "site" / "sitemap.xml").read_text(encoding="utf-8")
+        for uni_id in re.findall(r"/agreements\?uni=([a-z0-9-]+)", harita):
+            with self.subTest(uni=uni_id):
+                self.assertRegex(
+                    (ROOT / "site" / "app.js").read_text(encoding="utf-8"),
+                    r'link\[rel="canonical"\]',
+                    f"sitemap.xml `{uni_id}` için ayrı bir adres bildiriyor ama "
+                    f"app.js canonical'ı o adrese göre güncellemiyor · üç adres "
+                    f"de aynı sayfayı işaret etmiş olur.")
 
 
 class KaldirmaSozuUcSayfada(unittest.TestCase):

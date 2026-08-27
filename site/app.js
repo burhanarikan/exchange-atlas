@@ -562,6 +562,20 @@ function applyLang() {
     : "Verisi burada görünen bir kurumsanız: Düzeltme ya da kaldırma talebiniz gerekçe sorulmadan yerine getirilir.");
   ft.appendChild(soz);
   const repo = $("#repoLine");
+  // ?uni= ADRESİ KENDİ KANONİĞİNİ BİLDİRİYOR.
+  //
+  // Sayfa tek bir HTML dosyası, üç üniversiteyi de o dosya gösteriyor.
+  // Dolayısıyla üç adres de aynı sabit `canonical`'ı taşıyordu ve arama
+  // motoruna "bu üçü aynı sayfa" demiş oluyorduk · sitemap ise onları ayrı
+  // ayrı bildiriyordu. İki bildirim birbirini yalanlıyordu ve kaybeden
+  // kurumların anlaşma sayfaları oluyordu: Üçü tek adrese indirgenir,
+  // ikisi indekslenmezdi.
+  //
+  // Alan adı BURADA TEKRAR YAZILMIYOR · etiketin kendi değeri okunup
+  // üzerine parametre ekleniyor, yani adres tek yerde (HTML'de) duruyor.
+  const kanonik = document.querySelector('link[rel="canonical"]');
+  if (kanonik) kanonik.href = kanonik.href.split("?")[0] + `?uni=${encodeURIComponent(UNI.id)}`;
+
   if (repo) repo.innerHTML = lang === "en"
     ? '<span>Code, source documents and contributions: </span><a href="https://github.com/burhanarikan/exchange-atlas" target="_blank" rel="noopener">GitHub repository</a>.'
     : '<span>Kod, kaynak belgeler ve katkılar için: </span><a href="https://github.com/burhanarikan/exchange-atlas" target="_blank" rel="noopener">GitHub deposu</a>.';
