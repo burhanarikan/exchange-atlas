@@ -124,13 +124,18 @@ jobs:
         run: |
           set -euo pipefail
           base="${LIVE_SITE_URL%/}"
+          # Adresler UZANTISIZ · ölçüldü, bu liste `.html` biçimindeyken
+          # denetim SAYFAYI HİÇ GÖRMÜYORDU. Kanonik yayın `.html`'i uzantısıza
+          # 308 ile yönlendiriyor ve 308 yanıtının GÖVDESİ YOK. Aşağıdaki
+          # kalıplar "20x ya da 30x" kabul ettiği için denetim geçiyordu, ama
+          # başlıklar gerçek sayfada değil, boş bir yönlendirme yanıtında
+          # sınanmış oluyordu. Gerçek sayfanın başlıkları bozulsa görünmezdi.
           for path in \
             '/' \
-            '/index.html' \
-            '/agreements.html?uni=maku' \
-            '/agreements.html?uni=marmara' \
-            '/agreements.html?uni=esogu' \
-            '/guide.html?uni=maku'; do
+            '/agreements?uni=maku' \
+            '/agreements?uni=marmara' \
+            '/agreements?uni=esogu' \
+            '/guide?uni=maku'; do
             echo "--- ${base}${path}"
             headers="$(curl --fail --silent --show-error --retry 8 --retry-delay 5 --retry-all-errors \
               --max-time 30 -D - -o /dev/null "${base}${path}")"

@@ -66,9 +66,9 @@ GitHub Pages'te proje dosyasına bir `_headers` dosyası eklemek, GitHub'ın ken
 
 ```bash
 curl -sS -D - -o /dev/null https://exchangeatlas.org/
-curl -sS -D - -o /dev/null https://exchangeatlas.org/index.html
-curl -sS -D - -o /dev/null 'https://exchangeatlas.org/agreements.html?uni=maku'
-curl -sS -D - -o /dev/null 'https://exchangeatlas.org/guide.html?uni=maku'
+curl -sS -D - -o /dev/null https://exchangeatlas.org/
+curl -sS -D - -o /dev/null 'https://exchangeatlas.org/agreements?uni=maku'
+curl -sS -D - -o /dev/null 'https://exchangeatlas.org/guide?uni=maku'
 curl -sS -D - -o /dev/null http://exchangeatlas.org/
 ```
 
@@ -83,11 +83,11 @@ Her ana route'ta başlıklar tek tek kontrol edilir:
 ```bash
 for url in \
   'https://exchangeatlas.org/' \
-  'https://exchangeatlas.org/index.html' \
-  'https://exchangeatlas.org/agreements.html?uni=maku' \
+  'https://exchangeatlas.org/' \
+  'https://exchangeatlas.org/agreements?uni=maku' \
   'https://exchangeatlas.org/agreements.html?uni=marmara' \
   'https://exchangeatlas.org/agreements.html?uni=esogu' \
-  'https://exchangeatlas.org/guide.html?uni=maku'; do
+  'https://exchangeatlas.org/guide?uni=maku'; do
   echo "--- $url"
   curl -sS -D - -o /dev/null "$url" | grep -Ei '^(HTTP/|content-security-policy:|x-frame-options:|x-content-type-options:|referrer-policy:|permissions-policy:|strict-transport-security:)'
 done
