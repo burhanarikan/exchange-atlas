@@ -341,6 +341,45 @@ if __name__ == "__main__":
     unittest.main()
 
 
+class BagimlilikUstSiniri(unittest.TestCase):
+    """`requirements.txt` her bağımlılık için üst sınır taşımalı.
+
+    Sürüm hiç yazılmıyordu, yani CI her koşuda o günün en güncel sürümünü
+    kuruyordu. Bunun görünmeyen bedeli şu: Kırıcı bir major çıktığı gün, bu
+    depoda HİÇBİR ŞEY DEĞİŞMEDEN yayın hattı kırılırdı. Kırılma da yanıltıcı
+    görünürdü · son commit masum bir belge değişikliği olurdu ve hata onu
+    işaret ederdi.
+
+    Bekçi ALT sınıra karışmıyor, yalnız ÜST sınır arıyor. Ayrım kasıtlı:
+    Alt sınır "hangi sürümde sınadık" bilgisi, üst sınır ise sessiz major
+    geçişini durduran şey. İkincisi olmadan öteki bir şey korumuyor.
+
+    `.github/dependabot.yml` ile aynı çizgi: Major insan kararı, yama ve
+    küçük sürümler normal akışta geliyor.
+    """
+
+    def satirlar(self):
+        metin = (ROOT / "requirements.txt").read_text(encoding="utf-8")
+        return [s.strip() for s in metin.splitlines()
+                if s.strip() and not s.strip().startswith("#")]
+
+    def test_dosya_bos_degil(self):
+        """Boş dosya bu denetimi sessizce boşa çıkarırdı."""
+        self.assertGreater(len(self.satirlar()), 0,
+                           "requirements.txt'te hiç bağımlılık yok · "
+                           "aşağıdaki denetim boşa dönüyor.")
+
+    def test_her_bagimliligin_ust_siniri_var(self):
+        sinirsiz = [s for s in self.satirlar()
+                    if "<" not in s and "==" not in s and "~=" not in s]
+        self.assertEqual(sinirsiz, [],
+                         f"Üst sınırı olmayan bağımlılık: {sinirsiz}\n"
+                         f"Kırıcı bir major sürüm çıktığında yayın hattı, "
+                         f"depoda hiçbir şey değişmeden kırılır ve hata son "
+                         f"commit'i işaret eder.\n"
+                         f"Örnek: `openpyxl>=3.1.5,<4`")
+
+
 class ResponseHeaderYapilandirmasi(unittest.TestCase):
     """Başlık destekleyen barındırmalarda kullanılacak güvenlik politikası."""
 
