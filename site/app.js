@@ -170,7 +170,7 @@ function uniSecilemedi(unis) {
 
 /* ── init ───────────────────────────────── */
 async function init() {
-  const unis = await (await fetch("universities.json")).json();
+  const unis = await atlasJson("universities.json");
 
   // An unrecognised ?uni= value must NEVER fall back to a different university.
   // This used to read `|| unis[0]`. Invisible while there was only one university,
@@ -184,7 +184,7 @@ async function init() {
     : (unis.length === 1 ? unis[0] : null);
   if (!UNI) { uniSecilemedi(unis); return; }
 
-  DATA = await (await fetch(`data-${UNI.id}.json`)).json();
+  DATA = await atlasJson(`data-${UNI.id}.json`);
 
   // University badge, plus hide the guide tab for universities without a guide
   const abbrEl = $("#uniAbbr");
