@@ -1025,8 +1025,17 @@ class IcerikGuvenligiPolitikasi(unittest.TestCase):
     başlıklarla birlikte yazılı.
     """
 
-    SAYFALAR = ("index.html", "agreements.html", "guide.html")
+    # Liste ELLE yazılıydı ve üç sayfa sayıyordu. Bu arada `linkedin.html`
+    # eklendi, sonra `404.html` eklendi ve İKİSİ DE bu bekçinin görüş alanının
+    # dışında kaldı · CSP'leri doğru olduğu için hiçbir hata görünmedi, yani
+    # yanlış olsa da görünmeyecekti. Kapsam artık klasörden türüyor: Yeni bir
+    # sayfa eklendiği anda denetime giriyor, kimsenin listeyi güncellemesi
+    # gerekmiyor.
     YASAK = ("unsafe-inline", "unsafe-eval", "'*'", "http://", "https://")
+
+    @property
+    def SAYFALAR(self):
+        return tuple(y.name for y in sorted((ROOT / "site").glob("*.html")))
 
     def politika(self, ad):
         metin = (ROOT / "site" / ad).read_text(encoding="utf-8")
@@ -1077,6 +1086,184 @@ class IcerikGuvenligiPolitikasi(unittest.TestCase):
         self.assertEqual(bulgu, [],
                          f"Satır içi stil bulundu: {bulgu}\nCSP'ye 'unsafe-inline' "
                          f"eklemek gerekirdi; stil dosyaya taşınmalı.")
+
+
+class HataSayfasi(unittest.TestCase):
+    """`404.html` · yanlış adrese düşen kullanıcının gördüğü sayfa.
+
+    Sayfa YOKTU ve yokluğu şöyle görünüyordu: Yayın ortamı bilinmeyen her
+    adrese giriş sayfasını `200` ile döndürüyordu. Yani `/anlasmalar/maku`
+    gibi yanlış yazılmış bir adres "sayfa yok" demiyor, giriş sayfasını
+    gösteriyordu · üstelik BOZUK gösteriyordu, çünkü göreli varlık yolları
+    (`styles.css`) o derinlikte `/anlasmalar/styles.css` diye çözülüyor ve o
+    adres de HTML döndürüyordu. Ekranda yalnız devasa bir logo kalıyordu.
+
+    Buradaki denetimler o kusurun geri gelmesini engelliyor.
+    """
+
+    YOL = ROOT / "site" / "404.html"
+
+    def metin(self):
+        return self.YOL.read_text(encoding="utf-8")
+
+    def test_sayfa_var(self):
+        self.assertTrue(self.YOL.exists(),
+                        "404.html yok · yayın ortamı hatalı adreslere giriş "
+                        "sayfasını döndürür ve hata görünmez.")
+
+    def test_varlik_yollari_kokten_mutlak(self):
+        """EN KRİTİK DENETİM · sayfanın kendisi bozuk görünmesin diye.
+
+        Bu sayfa derin bir adreste (`/a/b/c`) gösteriliyor. Göreli yazılan bir
+        `styles.css` orada `/a/b/styles.css` diye çözülür, o adres HTML döner
+        ve `nosniff` onu bloklar. Kırık adresi bildiren sayfanın kendisi kırık
+        görünür · düzeltilen kusurun aynısı, bu kez hata sayfasında.
+        """
+        gorel = []
+        for kalip in (r'<link[^>]+href="([^"]+)"', r'<script[^>]+src="([^"]+)"',
+                      r'<img[^>]+src="([^"]+)"'):
+            for adres in re.findall(kalip, self.metin()):
+                if not adres.startswith(("/", "http://", "https://", "data:", "#")):
+                    gorel.append(adres)
+        self.assertEqual(gorel, [],
+                         f"404.html'de göreli varlık yolu var: {gorel}\n"
+                         f"Bu sayfa derin adreslerde de gösteriliyor; yollar "
+                         f"kökten mutlak ('/styles.css') olmak zorunda.")
+
+    def test_ic_baglantilar_kokten_mutlak(self):
+        """Aynı gerekçe gezinme bağlantıları için de geçerli.
+
+        `/a/b/c` adresinde göreli bir `agreements` bağlantısı `/a/b/agreements`
+        adresine gider · yani kullanıcıyı bir hata sayfasından ötekine yollar.
+        """
+        kotu = [h for h in re.findall(r'<a[^>]+href="([^"]+)"', self.metin())
+                if not h.startswith(("/", "http://", "https://", "mailto:", "#"))]
+        self.assertEqual(kotu, [],
+                         f"404.html'de göreli gezinme bağlantısı var: {kotu}")
+
+    def test_betige_bagli_degil(self):
+        """Hata sayfası sitenin EN dayanıklı sayfası olmak zorunda.
+
+        Öteki sayfalarda dil değiştirme betikten geliyor. Burada bilerek
+        gelmiyor: Betiği yüklenemeyen bir durumda gösterilen sayfanın betiğe
+        bağlı olması, kusurun kendisini tekrar üretmek olurdu. Metin bu yüzden
+        iki dilde birden ve doğrudan HTML'de yazılı.
+        """
+        self.assertEqual(re.findall(r"<script[\s>]", self.metin()), [],
+                         "404.html bir betiğe bağlanmış · sayfa betiksiz "
+                         "çalışmak zorunda.")
+        self.assertIn('lang="en"', self.metin(),
+                      "404.html'de İngilizce karşılık yok · dil düğmesi "
+                      "olmadığına göre iki dil de sayfada durmalı.")
+
+    def test_arama_motorlarina_kapali(self):
+        self.assertIn('<meta name="robots" content="noindex,follow">', self.metin(),
+                      "Hata sayfası indekslenmemeli · aksi hâlde arama "
+                      "sonuçlarında 'sayfa yok' diyen bir kayıt çıkar.")
+
+
+class VeriYuklemeBekcisi(unittest.TestCase):
+    """JSON istekleri tek bir politikadan geçiyor · `site/veri.js`.
+
+    İKİ ÖLÇÜMDEN DOĞDU
+
+    1. `res.ok` denetimi hiç yoktu. `app.js` doğrudan
+       `(await fetch(...)).json()` yazıyordu.
+    2. Yayın ortamı bilinmeyen bir adrese `404` DEĞİL, `200` ve `text/html`
+       döndürüyordu. Yani eksik bir veri dosyasında `res.ok` DOĞRU oluyor,
+       ardından `.json()` anlaşılmaz bir ayrıştırma hatası veriyordu.
+
+    İkisi birleşince "veri dosyası yok" durumu hiçbir yerde "yok" diye
+    görünmüyordu. Politika artık tek dosyada ve iki denetimi birden yapıyor.
+    """
+
+    VERI_JS = ROOT / "site" / "veri.js"
+    SAYFA_BETIKLERI = ("app.js", "home.js", "guide.js")
+
+    def test_bekci_iki_denetimi_de_yapiyor(self):
+        kaynak = self.VERI_JS.read_text(encoding="utf-8")
+        self.assertIn("res.ok", kaynak, "veri.js HTTP durumunu denetlemiyor.")
+        self.assertIn("content-type", kaynak,
+                      "veri.js içerik türünü denetlemiyor · `res.ok` tek başına "
+                      "yetmiyor, ölçüldü: yayın ortamı yok olan adrese 200 ve "
+                      "text/html dönüyordu.")
+
+    def test_sayfa_betikleri_ciplak_fetch_ile_json_okumuyor(self):
+        """Bekçi ancak HERKES ondan geçerse işe yarıyor.
+
+        Bir sayfa doğrudan `fetch(...).json()` yazarsa o sayfa sessizce
+        korumasız kalır ve hiçbir hata görünmez · politikanın üç kopyaya
+        ayrışması tam olarak böyle başlıyor.
+        """
+        kacak = []
+        for ad in self.SAYFA_BETIKLERI:
+            kaynak = (ROOT / "site" / ad).read_text(encoding="utf-8")
+            if re.search(r"\bfetch\s*\(", kaynak):
+                kacak.append(ad)
+        self.assertEqual(kacak, [],
+                         f"Bu betikler bekçiyi atlayıp doğrudan fetch çağırıyor: "
+                         f"{kacak}\nJSON istekleri `atlasJson()` üzerinden geçmeli.")
+
+    def test_bekciyi_kullanan_sayfa_onu_once_yukluyor(self):
+        """Yükleme sırası yanlışsa sayfa `atlasJson is not defined` ile ölür."""
+        kusur = []
+        for yol in sorted((ROOT / "site").glob("*.html")):
+            metin = yol.read_text(encoding="utf-8")
+            betikler = re.findall(r'<script[^>]+src="([^"]+)"', metin)
+            sayfa_betigi = [b for b in betikler if b in self.SAYFA_BETIKLERI]
+            if not sayfa_betigi:
+                continue
+            if "veri.js" not in betikler:
+                kusur.append(f"{yol.name}: veri.js yüklenmiyor")
+            elif betikler.index("veri.js") > betikler.index(sayfa_betigi[0]):
+                kusur.append(f"{yol.name}: veri.js sayfa betiğinden SONRA")
+        self.assertEqual(kusur, [], f"Betik yükleme sırası hatalı: {kusur}")
+
+    @unittest.skipUnless(shutil.which("node"), "node kurulu değil")
+    def test_bekci_html_yanitini_reddediyor(self):
+        """Kalıp değil, DAVRANIŞ denetimi · bekçi gerçekten çalışıyor mu.
+
+        Üç senaryo, üçü de bir kez gerçekten yaşandı ya da yaşanabilir:
+        doğru JSON, yayın ortamının 200+HTML yanıtı, ve düz 404.
+        """
+        betik = """
+        const fs = require("fs");
+        globalThis.window = {};
+        eval(fs.readFileSync(process.argv[1], "utf8"));
+        const atlasJson = globalThis.window.atlasJson;
+        function yanit(ok, status, tur) {
+          return Promise.resolve({
+            ok, status,
+            headers: { get: (k) => (k.toLowerCase() === "content-type" ? tur : null) },
+            json: () => Promise.resolve({ veri: 1 }),
+          });
+        }
+        const senaryolar = {
+          json: () => yanit(true, 200, "application/json"),
+          html200: () => yanit(true, 200, "text/html; charset=utf-8"),
+          yok404: () => yanit(false, 404, "text/html"),
+        };
+        (async () => {
+          const sonuc = {};
+          for (const [ad, f] of Object.entries(senaryolar)) {
+            globalThis.fetch = f;
+            try { await atlasJson("x.json"); sonuc[ad] = "cozuldu"; }
+            catch (e) { sonuc[ad] = "reddedildi"; }
+          }
+          console.log(JSON.stringify(sonuc));
+        })();
+        """
+        cikti = subprocess.run(["node", "-e", betik, str(self.VERI_JS)],
+                               capture_output=True, text=True, check=True).stdout
+        sonuc = json.loads(cikti)
+        self.assertEqual(sonuc["json"], "cozuldu",
+                         "Bekçi geçerli JSON yanıtını reddediyor.")
+        self.assertEqual(sonuc["html200"], "reddedildi",
+                         "Bekçi 200+text/html yanıtını KABUL ediyor · düzeltilen "
+                         "kusur bu, yayın ortamı yok olan adrese tam olarak "
+                         "bunu döndürüyordu.")
+        self.assertEqual(sonuc["yok404"], "reddedildi",
+                         "Bekçi 404 yanıtını kabul ediyor.")
 
 
 class LlmsTxtKapsami(unittest.TestCase):

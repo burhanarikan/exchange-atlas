@@ -144,8 +144,7 @@
     });
   });
 
-  fetch("universities.json")
-    .then(function (r) { return r.json(); })
+  atlasJson("universities.json")
     .then(function (unis) {
       UNIS = unis;
       UNI = UNI_ID
@@ -153,7 +152,9 @@
         : (unis.find(function (u) { return u.hasGuide; }) || unis[0]);
       apply();
     })
-    .catch(function () {
+    .catch(function (hata) {
+      // Teknik ayrıntı yalnız konsola · kullanıcıya yardımı yok.
+      console.error("Üniversite listesi yüklenemedi:", hata);
       apply();
     });
 })();

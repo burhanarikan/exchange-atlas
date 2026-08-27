@@ -158,6 +158,19 @@ a.uni-card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); bor
 .uni-go { flex-shrink: 0; font-size: 20px; color: var(--brand-blue); }
 .uni-card.ghost { border-style: dashed; background: var(--bg-cream); box-shadow: none; }
 
+/* ── 404 · hatalı adres sayfası ─────────────
+   Sayfa betiksiz ve iki dilli (bkz. 404.html içindeki gerekçe). `.alt-lang`
+   İngilizce karşılığı ikincil ton olarak gösteriyor; ayrı bir dil düğmesi
+   yok, çünkü hata sayfasının hiçbir betiğe bağlı olmaması gerekiyor. */
+/* Marka kilidi 404'te giriş sayfasına bağlantı · varsayılan alt çizgi
+   markayı bozuyordu. */
+a.brand-lock { text-decoration: none; color: inherit; }
+.landing-copy p.alt-lang { margin-top: 10px; font-size: 14px; color: rgba(255,255,255,.55); }
+.notfound-actions { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-width: 480px; }
+.notfound-actions a { display: block; background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px 18px; font-weight: 600; color: var(--brand-navy); text-decoration: none; transition: border-color var(--t-fast), box-shadow var(--t-base) var(--ease-out); }
+.notfound-actions a:hover { border-color: var(--brand-blue); box-shadow: var(--shadow-1); }
+.notfound-actions .alt-lang { font-weight: 500; color: var(--ink-4); }
+
 @media (max-width: 900px) {
   .landing-hero-inner { padding: 18px 18px 40px; }
   /* Marka ile dil düğmesi dar ekranda tek satıra sığmıyor. Ana sayfada marka
