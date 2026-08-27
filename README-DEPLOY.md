@@ -115,17 +115,28 @@ Yukarıdaki komutlar **depodaki** dosyalara bakar. Bu yeterli değil: Yayın ort
 Kritik ayrıntı, denetimin nasıl yazılacağını belirliyor: **Enjeksiyon yalnız tarayıcı gibi görünen isteklere yapılıyor.**
 
 ```
-depodaki index.html      : 8507 bayt
-düz curl ile gelen       : 8507 bayt   · temiz
-tarayıcı User-Agent ile  : 8866 bayt   · +359 bayt izleme betiği
+depodaki index.html    : 8507 bayt
+düz curl ile gelen     : 8507 bayt   · temiz
+tarayıcı başlıklarıyla : 8866 bayt   · +359 bayt izleme betiği
 ```
 
-Yani düz `curl` ile yapılan bir denetim bu betiği hiçbir zaman göremez. `live_check` işindeki "canlı sayfada üçüncü taraf izleme yok" adımı bu yüzden isteği bilerek tarayıcı başlıklarıyla gönderiyor.
+**Tetikleyen başlık `Accept`, `User-Agent` değil.** Tek tek ölçüldü:
+
+| İstek | Sonuç |
+|---|---|
+| hiç başlık yok | temiz |
+| sadece `User-Agent` | temiz · **sezgiye aykırı olan bu** |
+| sadece `Accept: text/html,...` | izleme var |
+| ikisi birden | izleme var |
+
+Bu ayrım yazılı, çünkü yanlış bilinirse denetim **sessizce körleşir**: "User-Agent yeter" diye `Accept` kaldırılırsa komut temiz sonuç verir ve izleme fark edilmeden geri gelir. `live_check` işindeki adım bu yüzden ikisini birden gönderiyor · `Accept` zorunlu, `User-Agent` gerçek bir tarayıcıya benzemek için.
 
 Elle bakmak gerekirse:
 
 ```bash
-curl -s -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36' \
+curl -s \
+  -H 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36' \
+  -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' \
   https://exchangeatlas.org/ | grep -Eio '<script[^>]+src="https?://[^"]*'
 ```
 

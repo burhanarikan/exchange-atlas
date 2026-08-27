@@ -152,14 +152,25 @@ jobs:
       # Yayın ortamı, sayfaya kendi izleme betiğini KENDİSİ ekliyordu.
       #
       # Ölçüldü · sayı sayıyla:
-      #   depodaki index.html        : 8507 bayt
-      #   düz curl ile gelen         : 8507 bayt  · temiz
-      #   tarayıcı User-Agent ile    : 8866 bayt  · +359 bayt izleme betiği
+      #   depodaki index.html   : 8507 bayt
+      #   düz curl ile gelen    : 8507 bayt  · temiz
+      #   tarayıcı başlıklarıyla: 8866 bayt  · +359 bayt izleme betiği
       #
-      # YANİ ENJEKSİYON YALNIZ TARAYICI GİBİ GÖRÜNEN İSTEKLERE YAPILIYOR.
-      # Yukarıdaki denetimler düz curl kullanıyor, dolayısıyla bu betiği
-      # HİÇBİR ZAMAN göremezlerdi · bekçi vardı ama tam da bu duruma kördü.
-      # Bu yüzden aşağıdaki istek bilerek tarayıcı başlıklarıyla gidiyor.
+      # TETİKLEYEN BAŞLIK `Accept` · `User-Agent` DEĞİL. Ölçüldü, tek tek:
+      #
+      #   hiç başlık yok      → temiz
+      #   sadece User-Agent   → temiz      ← sezgiye aykırı olan bu
+      #   sadece Accept       → İZLEME VAR
+      #   ikisi birden        → İZLEME VAR
+      #
+      # Bu ayrım yazılı, çünkü yanlış bilinirse bekçi SESSİZCE KÖRLEŞİR:
+      # "User-Agent yeter" diye Accept başlığı kaldırılırsa denetim temiz
+      # rapor eder ve izleme fark edilmeden geri gelir. Aşağıdaki istek bu
+      # yüzden ikisini birden gönderiyor · Accept zorunlu, User-Agent ise
+      # gerçek bir tarayıcıya benzemek için.
+      #
+      # Yukarıdaki header denetimleri düz curl kullanıyor, dolayısıyla bu
+      # betiği HİÇBİR ZAMAN göremezlerdi · bekçi vardı ama bu duruma kördü.
       #
       # Şu an CSP (`script-src 'self'`) betiği bloklıyor, yani ziyaretçinin
       # adresi üçüncü tarafa gitmiyor. Ama gizlilik iddiası TEK BİR SATIRA
