@@ -71,10 +71,13 @@ anlatan kayıtlar taşıyor · çoğu bir kez gerçekten yaşanmış bir hatayı
 ### Değiştirdikten sonra
 
 ```bash
+python3 -m pip install -r requirements.txt
 python3 -m unittest discover -s tests
 ```
 
-Kurulum yok, bağımlılık yok, ağ yok. Hepsi geçmeli.
+Veri üretimi ve testler için Python bağımlılığı `openpyxl`, JavaScript davranış
+kontrolleri için Node.js gerekir. Testler ağ kullanmaz; hepsi geçmeli.
+Bu geliştirme araçları ziyaretçinin tarayıcısına yüklenmez.
 
 ### Yeni bir denetim yazdıysanız
 
@@ -105,6 +108,10 @@ kontrolleri hatırlatır. Anlamlı kullanıcı veya bakım değişiklikleri ayr�
 ---
 
 ## Veri hakkında
+
+Kaynak yenileme ve yeni üniversite ekleme adımları:
+[`VERI-BAKIMI.md`](VERI-BAKIMI.md). Kurum tanımları
+[`config/universities.json`](config/universities.json) içinde tutulur.
 
 Anlaşma verisi bize ait değil · üniversitelerin kamuya açık listelerinden
 derlendi. Ne aldığımız [`KAYNAK.md §1`](KAYNAK.md#1--tablonuzdan-ne-okuyoruz)'de,

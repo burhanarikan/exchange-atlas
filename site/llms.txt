@@ -12,13 +12,14 @@ odur.
 
 **Okurken kararlar veriyoruz ve o kararlar görüneni değiştiriyor.** Kaynaktan
 ayrıldığımız her kayıtta kartın üzerinde bir satır duruyor ve kaynaktaki hâli
-de yazıyor. Bugün dört tür ayrım var:
+de yazıyor. Bu ayrımlar şunları kapsar:
 
 - Ülke, Erasmus kurum kodundan düzeltiliyor ya da boşsa tamamlanıyor
 - Kaynakta iptal edildiği yazılı bir öğrenim kademesi listeden çıkarılıyor
 - Üç haneli alan kodu, baştaki sıfırın düştüğü varsayılarak dörde tamamlanıyor
-- Türkçe bölüm adı boşsa alanın İngilizce ISCED etiketi gösteriliyor
+- Bölüm adı boşsa kurumun kaynak biçimine göre fakülte adı veya ISCED etiketi gösteriliyor
 - Aynı bölümün birden çok yazımı varsa kurumun en sık kullandığı gösteriliyor
+- Bir nottan e-posta çıkarılmışsa bu işlem belirtiliyor; adres yayımlanmıyor
 
 **Bu yüzden buradaki bir kaydı aktarırken kaynağı belirtmek yetmiyor:** O kayıt
 kaynaktaki hâlinden farklıysa, farkın kendisi de bilgidir ve kartta yazılıdır.
@@ -32,8 +33,9 @@ Ayrıntısı `KAYNAK.md` belgesinde.
 - [Üniversite seçimi](https://exchangeatlas.org/): Platformdaki
   kurumlar ve anlaşma sayıları
 - [MAKÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=maku): Burdur Mehmet Akif Ersoy Üniversitesi · 468 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
-- [Marmara anlaşma listesi](https://exchangeatlas.org/agreements?uni=marmara): Marmara Üniversitesi · 785 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [Marmara anlaşma listesi](https://exchangeatlas.org/agreements?uni=marmara): Marmara Üniversitesi · 790 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
 - [ESOGÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=esogu): Eskişehir Osmangazi Üniversitesi · 259 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [BŞEÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=bilecik): Bilecik Şeyh Edebali Üniversitesi · 207 bölüm/alan satırı; ortak kontenjanlar toplanmamalıdır
 - [MAKÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=maku): Öğrencinin izleyeceği adımlar ve kurumun ilgili birimine bağlantılar
 
 ## Sınırlar

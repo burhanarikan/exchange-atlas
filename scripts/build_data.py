@@ -3,21 +3,28 @@
 İkili anlaşma listeleri -> site/data-<uni>.json + site/universities.json
 
 Çok üniversiteli: her üniversitenin kendi Excel formatı için ayrı parser var,
-hepsi aynı kayıt şemasına normalize edilir. Yeni üniversite = UNIVERSITIES'e kayıt +
-parser fonksiyonu.
+hepsi aynı kayıt şemasına normalize edilir. Yeni üniversite =
+config/universities.json içinde kayıt + parser fonksiyonu.
 
   Yerel snapshot'lardan (varsayılan, demo için güvenli):
       python3 scripts/build_data.py
   Canlı kaynaklardan çek:
       python3 scripts/build_data.py --pull
 """
+import argparse
+import hashlib
+import io
 import json
 import re
 import sys
 import unicodedata
 import urllib.request
-from datetime import datetime
+from collections import Counter
+from datetime import date, datetime
+from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import quote, urljoin, urlsplit
+from zipfile import BadZipFile, ZipFile, is_zipfile
 
 import openpyxl
 
@@ -206,12 +213,12 @@ ERASMUS_ULKE = {
     "CZ": "Çekya", "DE": "Almanya", "DK": "Danimarka", "EE": "Estonya",
     "EL": "Yunanistan", "ES": "İspanya", "FI": "Finlandiya", "FR": "Fransa",
     "HR": "Hırvatistan", "HU": "Macaristan", "IE": "İrlanda", "IS": "İzlanda",
-    "IT": "İtalya", "LT": "Litvanya", "LV": "Letonya", "MK": "Kuzey Makedonya",
+    "IT": "İtalya", "LT": "Litvanya", "LV": "Letonya", "LU": "Lüksemburg", "MK": "Kuzey Makedonya",
     "MT": "Malta", "NL": "Hollanda", "NO": "Norveç", "PL": "Polonya",
     "PT": "Portekiz", "RO": "Romanya", "RS": "Sırbistan", "SE": "İsveç",
     "SI": "Slovenya", "SK": "Slovakya", "TR": "Türkiye", "UK": "Birleşik Krallık",
     # Pre-2014 single-letter codes
-    "A": "Avusturya", "B": "Belçika", "D": "Almanya", "E": "İspanya",
+    "A": "Avusturya", "B": "Belçika", "D": "Almanya", "E": "İspanya", "L": "Lüksemburg",
     "F": "Fransa", "G": "Yunanistan", "I": "İtalya", "P": "Portekiz",
     # S (Sverige) was missing until Marmara's list arrived: five rows were
     # dropped for an unreadable country. Three witnesses agree it is Sweden ·
@@ -808,152 +815,320 @@ def parse_esogu(ws):
     return agreements
 
 
+# ═══════════════════════════════ BILECIK ═════════════════════════════
+
+BILECIK_HEADERS = {
+    2: "SÜRE", 6: "Üniversite Adı", 7: "Ülke/Şehir", 8: "Erasmus Kodu",
+    9: "ISCED(Uluslar arası alan kodu ve isimleri)", 10: "Fakülte", 11: "Bölüm/Program",
+    12: "Lisansüstü Eğitim Enstitüsü", 13: "Meslek Yüksekokulu",
+    14: "(Lisans) Öğrenim Oğrenci sayısı*ay(Ön lisans,YL ve Dr dahil, kontenjanları var ise)",
+    15: "(Lisans) Staj Oğrenci sayısı*ay(Ön lisans,YL ve Dr dahil, kontenjanları var ise)",
+    16: "Ders verme Personel sayısı*gün", 17: "Eğitim Alma Personel sayısı*gün", 19: "websitesi",
+}
+
+def parse_bilecik(ws):
+    """Birleştirilmiş hücreleri kendi sınırları içinde açar; boşluğu tahmin etmez.
+
+    Kontenjanlar kişi*ay ve kişi*gün biçiminde korunur. Bir kontenjan hücresi
+    birden çok satırı kapsıyorsa bunlar ayrı kontenjanlar gibi toplanamaz.
+    Birden fazla ISCED ailesi taşıyan hücre tek bir aileye zorlanmaz.
+    """
+    for col, title in BILECIK_HEADERS.items():
+        if clean(ws.cell(2, col).value) != title:
+            raise ValueError(f"Bilecik: {col}. sütun başlığı değişti: {title}")
+    merged = {}
+    for area in ws.merged_cells.ranges:
+        for row in range(area.min_row, area.max_row + 1):
+            for col in range(area.min_col, min(area.max_col, 19) + 1):
+                merged[row, col] = (area.min_row, area.min_col, area.max_row)
+
+    def value(row, col):
+        start = merged.get((row, col), (row, col, row))
+        return clean(ws.cell(start[0], start[1]).value)
+
+    agreements = []
+    for row in range(3, ws.max_row + 1):
+        # Fully merged blank rows are visual spacing, not additional records.
+        if not any(clean(ws.cell(row, col).value) for col in (6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17)):
+            continue
+        university, code = value(row, 6), value(row, 8)
+        if not university or not code:
+            continue
+        department, faculty, field = value(row, 11), value(row, 10), value(row, 9)
+        trace = {}
+        raw_country = value(row, 7).split("/")[0].strip()
+        aliases = {"Latvia": "Letonya", "luxembourg": "Lüksemburg", "Çek Cumhuriyeti": "Çekya"}
+        country = aliases.get(raw_country, raw_country)
+        from_code = ulke_onekten(code)
+        if from_code and country != from_code:
+            trace["country"] = {"kaynakta": raw_country, "sebep": "erasmus-kodu"}
+            country = from_code
+        if country not in ERASMUS_ULKE.values():
+            raise ValueError(f"Bilecik: {row}. satırın ülkesi okunamadı: {code}")
+        if not department:
+            department = faculty or field
+            trace["department"] = {"kaynakta": None, "sebep": "fakulte-adi" if faculty else "isced-etiketi"}
+        codes = re.findall(r"\b\d{3,4}\b", field)
+        families = {c[:2] if c[:2] in ISCED_FAMILY else None for c in codes}
+        field_code = codes[0] if len(families) == 1 and None not in families else ""
+        quota, masters, associate = value(row, 14), value(row, 12), value(row, 13)
+        levels = {}
+        study_shared = merged.get((row, 14), (row, 14, row))[2] > merged.get((row, 14), (row, 14, row))[0]
+        # Only explicit source columns establish levels; no counts are invented.
+        if re.match(r"^[1-9]\d*", quota):
+            levels["lisans"] = "shared" if study_shared or masters not in ("", "0") or associate not in ("", "0") else re.match(r"\d+", quota).group()
+        if masters and masters != "0":
+            levels["yukseklisans"] = "shared"
+            if "DR" in masters.upper():
+                levels["doktora"] = "shared"
+        if associate and associate != "0":
+            levels["onlisans"] = "shared"
+        shared = any(merged.get((row, col), (row, col, row))[2] >
+                     merged.get((row, col), (row, col, row))[0] for col in range(14, 18))
+        # Keep the complete field label, including additional codes, searchable.
+        rec = {
+            "country": tr_upper(country), "erasmusCode": code,
+            "university": university, "department": department,
+            "validity": parse_validity(value(row, 2)), "iscedCode": field_code,
+            "levels": levels, "quotaStudy": quota, "quotaInternship": value(row, 15),
+            "quotaStaffTeach": value(row, 16), "quotaStaffTrain": value(row, 17),
+            "quotaNote": "", "language": None,
+            "quotaFormat": "person-duration", "quotaGraduate": masters, "quotaAssociate": associate,
+            "sourceRow": row, "sharedQuota": shared,
+            "sourceField": field,
+            **({"sourceDiff": trace} if trace else {}),
+        }
+        website = value(row, 19)
+        if website.startswith(("https://", "http://")):
+            rec["website"] = website
+        rec.update(fam_fields(field_code))
+        if rec["iscedFamily"] and aile_tahminle_bulundu(field_code):
+            rec.setdefault("sourceDiff", {})["iscedFamily"] = {"kaynakta": field_code, "sebep": "eksik-sifir"}
+        rec["search"] = make_search(rec, extra=faculty + " " + field)
+        agreements.append(rec)
+    return agreements
+
+
 # ═══════════════════════════ University registry ════════════════════
 
-UNIVERSITIES = [
-    {
-        "id": "maku",
-        "nameTr": "Burdur Mehmet Akif Ersoy Üniversitesi",
-        "nameEn": "Burdur Mehmet Akif Ersoy University",
-        "abbr": "MAKÜ",
-        "monogram": "M",
-        "creditTr": "Veri: MAKÜ Uluslararası İlişkiler Koordinatörlüğü",
-        "creditEn": "Data: MAKÜ International Relations Office",
-        "hasGuide": True,
-        "local": ROOT / "lokal" / "maku" / "maku-ka131-ikili-anlasmalar.xlsx",
-        # The file name is versioned; when it breaks, the current link comes
-        # from listUrl below. listUrl is also SHOWN ON THE SITE: a reader must
-        # be able to reach the institution's own list in one click and compare.
-        "pullUrl": "https://depo2.mehmetakif.edu.tr/storage/iro/contents/24317/29_24317_2026-03-31-10-48-36-47697_ka-3--ikili-anlasmalar-surum-2-22-26.xlsx",
-        "listUrl": "https://iro.mehmetakif.edu.tr/content/24317/1/erasmus-ka131-ikili-anlasmalari",
-        "sheet": 0,
-        "parser": parse_maku,
-    },
-    {
-        "id": "marmara",
-        "nameTr": "Marmara Üniversitesi",
-        "nameEn": "Marmara University",
-        "abbr": "MÜ",
-        "monogram": "MÜ",
-        "creditTr": "Veri: Marmara Üniversitesi Uluslararası İlişkiler Koordinatörlüğü",
-        "creditEn": "Data: Marmara University International Relations Office",
-        "hasGuide": False,
-        "local": ROOT / "lokal" / "marmara" / "marmara-ka131-ikili-anlasmalar.xlsx",
-        # The file sits behind a share link with an opaque token, so there is no
-        # stable direct URL to pull from. The list page is the durable address;
-        # a new file is fetched by hand from there.
-        "pullUrl": None,
-        "listUrl": "https://cloud.marmara.edu.tr/s/1kNVSU18NKjHkdy?openfile=true",
-        # None = the parser wants the WHOLE workbook, not one sheet: the
-        # agreements are spread over 27 faculty sheets.
-        "sheet": None,
-        "parser": parse_marmara,
-    },
-    {
-        "id": "esogu",
-        "nameTr": "Eskişehir Osmangazi Üniversitesi",
-        "nameEn": "Eskisehir Osmangazi University",
-        "abbr": "ESOGÜ",
-        "monogram": "E",
-        "creditTr": "Veri: ESOGÜ Uluslararası İlişkiler Birimi",
-        "creditEn": "Data: ESOGU International Relations Office",
-        "hasGuide": False,
-        "local": ROOT / "lokal" / "esogu" / "esogu-ikili-anlasmalar.xlsx",
-        "pullUrl": None,
-        "listUrl": "https://iro.ogu.edu.tr/Sayfa/Index/22/ikili-anlasmalar",
-        "sheet": 0,
-        "parser": parse_esogu,
-    },
-]
+def load_registry():
+    """Kurum eklerken kimlik ve kaynak bilgisi tek dosyada tutulur."""
+    entries = json.loads((ROOT / "config" / "universities.json").read_text(encoding="utf-8"))
+    parsers = {p.__name__: p for p in (parse_maku, parse_marmara, parse_esogu, parse_bilecik)}
+    seen = set()
+    for entry in entries:
+        uid = entry["id"]
+        if not re.fullmatch(r"[a-z][a-z0-9-]*", uid) or uid in seen:
+            raise ValueError(f"Geçersiz ya da yinelenen kurum kimliği: {uid}")
+        seen.add(uid)
+        local = (ROOT / entry["local"]).resolve()
+        if not local.is_relative_to(ROOT / "lokal"):
+            raise ValueError(f"{uid}: kaynak dosya lokal/ altında olmalı")
+        entry["local"] = local
+        entry["parser"] = parsers[entry["parser"]]
+    return entries
 
 
-def load_ws(uni, pull):
-    """Returns what the parser asked for: one worksheet, or the whole workbook.
+UNIVERSITIES = load_registry()
+MAX_SOURCE_BYTES = 20 * 1024 * 1024
 
-    `sheet: None` means the parser needs every sheet (Marmara spreads its
-    agreements over 27 faculty sheets). Passing the workbook instead of
-    silently handing over the first sheet keeps the choice visible here rather
-    than hidden inside each parser.
+
+class SourceLinks(HTMLParser):
+    def __init__(self, base):
+        super().__init__()
+        self.base, self.links = base, set()
+
+    def handle_starttag(self, tag, attrs):
+        href = dict(attrs).get("href", "")
+        if tag == "a" and urlsplit(href).path.lower().endswith(".xlsx"):
+            self.links.add(urljoin(self.base, href))
+
+
+def fetch_bytes(url):
+    """İndirmeyi boyut ve süreyle sınırlar; başarısız isteği gizlemez."""
+    if urlsplit(url).scheme not in ("https", "http"):
+        raise ValueError("Kaynak adresi HTTP(S) olmalı")
+    url = quote(url, safe=":/?&=%()+,;@")
+    req = urllib.request.Request(url, headers={"User-Agent": "ExchangeAtlas-source-check/1.0"})
+    with urllib.request.urlopen(req, timeout=30) as response:
+        data = response.read(MAX_SOURCE_BYTES + 1)
+        final_url = response.url
+    if len(data) > MAX_SOURCE_BYTES:
+        raise ValueError("Kaynak dosya 20 MB sınırını aşıyor")
+    return data, final_url
+
+
+def download_source(uni):
+    """Resmî sayfadaki tek Excel'i veya paylaşım arşivindeki tek Excel'i alır.
+
+    Birden fazla aday varsa ilkini seçmez. Kaynak biçimi değiştiğinde işlem
+    durur; bakımcı hangi listenin kullanılacağına karar verir.
     """
-    src = uni["local"]
-    if pull:
-        if not uni.get("pullUrl"):
-            # Not every source has a stable direct URL. Saying so is better
-            # than a generic failure: the file is fetched by hand from listUrl.
-            print(f"  {uni['id']}: doğrudan indirme adresi yok, yerel snapshot "
-                  f"kullanılıyor · yeni dosya {uni.get('listUrl')} sayfasından alınır",
-                  file=sys.stderr)
-        else:
-            try:
-                print(f"  çekiliyor: {uni['pullUrl']}", file=sys.stderr)
-                data = urllib.request.urlopen(uni["pullUrl"], timeout=60).read()
-                src.write_bytes(data)
-            except Exception as e:
-                print(f"  UYARI: {uni['id']} canlı çekilemedi ({e}), yerel snapshot "
-                      f"kullanılıyor", file=sys.stderr)
-    wb = openpyxl.load_workbook(src, data_only=True)
-    if uni["sheet"] is None:
-        return wb
-    return wb[uni["sheet"]] if isinstance(uni["sheet"], str) else wb.worksheets[uni["sheet"]]
+    mode = uni["downloadMode"]
+    if mode == "page-xlsx":
+        page, page_url = fetch_bytes(uni["listUrl"])
+        links = SourceLinks(page_url)
+        links.feed(page.decode("utf-8-sig"))
+        candidates = {quote(url, safe=":/?&=%()+,;@") for url in links.links}
+        if uni.get("fileContains"):
+            candidates = {url for url in candidates if uni["fileContains"] in url}
+        if len(candidates) != 1:
+            raise ValueError(f"{uni['id']}: resmî sayfada {len(candidates)} Excel bulundu; kaynak seçimi gerekli")
+        url = candidates.pop()
+    elif mode in ("share-zip", "direct"):
+        url = uni["pullUrl"]
+    else:
+        raise ValueError(f"Bilinmeyen indirme yöntemi: {mode}")
+    data, url = fetch_bytes(url)
+    member = None
+    if mode == "share-zip":
+        with ZipFile(io.BytesIO(data)) as archive:
+            candidates = [info for info in archive.infolist()
+                          if not info.is_dir() and info.filename.lower().endswith(".xlsx")
+                          and not Path(info.filename).name.startswith("~$")]
+            if len(candidates) != 1:
+                raise ValueError(f"{uni['id']}: paylaşımda {len(candidates)} Excel bulundu")
+            info = candidates[0]
+            if info.file_size > MAX_SOURCE_BYTES:
+                raise ValueError("Arşivdeki Excel 20 MB sınırını aşıyor")
+            member = info.filename
+            data = archive.read(info)
+    if not is_zipfile(io.BytesIO(data)):
+        raise ValueError(f"{uni['id']}: yanıt bir Excel dosyası değil")
+    return data, url, member
 
 
-def build(pull=False):
-    SITE.mkdir(parents=True, exist_ok=True)
-    registry = []
+def parse_source(uni, data):
+    """Kaynak açılmadan ya da ayrıştırma bitmeden hiçbir çıktı değiştirilmez."""
+    wb = openpyxl.load_workbook(io.BytesIO(data), data_only=True)
+    try:
+        sheet = uni["sheet"]
+        ws = wb if sheet is None else wb[sheet] if isinstance(sheet, str) else wb.worksheets[sheet]
+        # Guard every positional column before interpreting a refreshed file.
+        if uni["parser"] is parse_marmara:
+            expected = ["ERASMUS ID", "ÜNİVERSİTE ADI", "BAŞLANGIÇ", "BİTİŞ", "BÖLÜM", "ÖĞRENİM KONTENJAN", "STAJ KONTENJAN", "DERS VERME", "EĞİTİM ALMA", "YABANCI DİL", "AÇIKLAMA", "ANLAŞMA TÜRÜ"]
+            for tab in wb.worksheets:
+                if [clean(tab.cell(1, c).value) for c in range(1, 13)] != expected:
+                    raise ValueError(f"{uni['id']}: {tab.title} sütun başlıkları değişti")
+        elif uni["parser"] is parse_esogu:
+            expected = {1: "FAKÜLTE", 2: "BÖLÜM", 3: "ERASMUS ID", 4: "ÜNİVERSİTE", 5: "ÜLKE", 7: "ÖN LİSANS", 8: "LİSANS", 9: "YÜKSEK LİSANS", 10: "DOKTORA", 11: "DERS VERME", 12: "EĞİTİM ALMA"}
+            if any(clean(ws.cell(1, c).value) != label for c, label in expected.items()):
+                raise ValueError(f"{uni['id']}: sütun başlıkları değişti")
+        agreements = uni["parser"](ws)
+    finally:
+        wb.close()
+    unify_department_spelling(agreements)
+    validate_agreements(uni["id"], agreements)
+    return agreements
+
+
+def validate_agreements(uid, agreements):
+    """Boş ya da şeması bozuk yeni bir kaynağın mevcut listeyi silmesini önler."""
+    required = {"country", "erasmusCode", "university", "department", "search", "levels",
+                "iscedCode", "iscedFamily", "iscedFamilyTr", "iscedFamilyEn", "validity",
+                "quotaStudy", "quotaInternship", "quotaStaffTeach", "quotaStaffTrain", "quotaNote", "language"}
+    if not agreements:
+        raise ValueError(f"{uid}: ayrıştırıcı hiç kayıt üretmedi")
+    for index, rec in enumerate(agreements, 1):
+        if required - rec.keys() or not all(rec.get(k) for k in ("country", "university", "department")):
+            raise ValueError(f"{uid}: {index}. kayıt eksik veya boş alan taşıyor")
+        if not isinstance(rec["levels"], dict) or set(rec["levels"]) - {"onlisans", "lisans", "yukseklisans", "doktora"}:
+            raise ValueError(f"{uid}: {index}. kayıt geçersiz derece taşıyor")
+        if re.search(r"[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}", json.dumps(rec, ensure_ascii=False)):
+            raise ValueError(f"{uid}: {index}. kayıt e-posta içeriyor")
+
+
+def record_delta(previous, current):
+    """Tekrarlanan satırları kaybetmeden eklenen ve çıkarılan kayıtları sayar."""
+    def bag(records):
+        return Counter(json.dumps(r, sort_keys=True, ensure_ascii=False) for r in records)
+    old, new = bag(previous), bag(current)
+    return {"added": sum((new - old).values()), "removed": sum((old - new).values())}
+
+
+def build(pull=False, university_ids=None, dry_run=False, report_path=None):
+    """Seçili kurumları hazırlar; tümü doğrulandıktan sonra kaynak ve siteyi yazar."""
+    selected = set(university_ids or [u["id"] for u in UNIVERSITIES])
+    unknown = selected - {u["id"] for u in UNIVERSITIES}
+    if unknown:
+        raise ValueError(f"Bilinmeyen kurum: {', '.join(sorted(unknown))}")
+    catalogue_path = SITE / "kaynak-kunyesi.json"
+    catalogue = json.loads(catalogue_path.read_text(encoding="utf-8"))
+    sources = {s["id"]: s for s in catalogue["kaynaklar"]}
+    registry_path = SITE / "universities.json"
+    registry = {u["id"]: u for u in json.loads(registry_path.read_text(encoding="utf-8"))}
     now = datetime.now().isoformat(timespec="seconds")
-
+    today = date.today().isoformat()
+    pending, reports = [], []
     for uni in UNIVERSITIES:
-        print(f"{uni['id']}: {uni['local'].name}", file=sys.stderr)
-        agreements = uni["parser"](load_ws(uni, pull))
-        birlesen, beraberlik = unify_department_spelling(agreements)
-        if birlesen or beraberlik:
-            print(f"  {uni['id']}: bölüm yazımı · {birlesen} kayıt birleştirildi, "
-                  f"{beraberlik} grupta beraberlik (dokunulmadı)", file=sys.stderr)
+        uid = uni["id"]
+        if uid not in selected:
+            continue
+        old_source = sources.get(uid, {})
+        if pull:
+            data, url, member = download_source(uni)
+        else:
+            if not uni["local"].exists():
+                raise ValueError(f"{uid}: kaynak dosya yok; --pull --university {uid} kullanın")
+            data, url, member = uni["local"].read_bytes(), old_source.get("dosya_adresi"), old_source.get("arsiv_uyesi")
+        digest = hashlib.sha256(data).hexdigest()
+        if not pull and digest != old_source.get("sha256"):
+            raise ValueError(f"{uid}: yerel dosya kayıtlı kaynakla uyuşmuyor; resmî kaynaktan --pull ile doğrulayın")
+        agreements = parse_source(uni, data)
+        source = dict(old_source)
+        source.update({"id": uid, "kurum": uni["nameTr"], "birim": uni["creditTr"].removeprefix("Veri: "),
+                       "liste_sayfasi": uni["listUrl"], "dosya_adresi": url,
+                       "yerel_ad": str(uni["local"].relative_to(ROOT)),
+                       "sha256": digest, "boyut_bayt": len(data), "kayit_sayisi": len(agreements)})
+        if pull:
+            source["son_kontrol_tarihi"] = today
+            if digest != old_source.get("sha256"):
+                source["indirme_tarihi"] = today
+        if member:
+            source["arsiv_uyesi"] = member
+        source["adres_notu"] = ("Paylaşım arşivindeki tek Excel otomatik alınır; birden çok Excel varsa işlem durur."
+                                 if uni["downloadMode"] == "share-zip" else
+                                 "Dosya adresi değişebilir; resmî liste sayfasındaki tek Excel bağlantısı yeniden bulunur."
+                                 if uni["downloadMode"] == "page-xlsx" else "Doğrudan adres kurum kaydında tutulur; adres değişirse güncellenir.")
+        metadata = {"sourceDownloadedAt": source.get("indirme_tarihi"),
+                    "sourceCheckedAt": source.get("son_kontrol_tarihi"), "sourceSha256": digest}
         countries = sorted({a["country"] for a in agreements})
-        families = {}
-        for a in agreements:
-            if a["iscedFamily"]:
-                families[a["iscedFamily"]] = families.get(a["iscedFamily"], 0) + 1
-        out = {
-            "generatedAt": now,
-            "source": "live" if pull else "local-snapshot",
-            "count": len(agreements),
-            "countries": countries,
-            "iscedFamilies": [
-                {"code": k, "tr": ISCED_FAMILY[k][0], "en": ISCED_FAMILY[k][1], "count": v}
-                for k, v in sorted(families.items())
-            ],
-            "agreements": agreements,
-        }
-        path = SITE / f"data-{uni['id']}.json"
-        path.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
-
-        bil = sum(1 for a in agreements if "bilgisayar" in a["search"] or "computer" in a["search"])
-        print(f"  OK kayıt={len(agreements)} ülke={len(countries)} "
-              f"aile={len(families)} bilgisayar/computer={bil} -> {path.name} "
-              f"({path.stat().st_size // 1024} KB)", file=sys.stderr)
-
-        registry.append({
-            "id": uni["id"], "nameTr": uni["nameTr"], "nameEn": uni["nameEn"],
-            "abbr": uni["abbr"], "monogram": uni["monogram"],
-            # The institution's own list. Shown on the site so a reader can go
-            # to the source and compare · this is what makes "we changed
-            # things" checkable instead of a claim.
-            "sourceUrl": uni.get("listUrl"),
-            # How many records are shown differently from the source. Counted,
-            # not written: the number moves with the data.
-            "diffCount": sum(1 for a in agreements if a.get("sourceDiff")),
-            "creditTr": uni["creditTr"], "creditEn": uni["creditEn"],
-            "hasGuide": uni["hasGuide"],
-            "count": len(agreements), "countries": len(countries),
-            "universities": len({a["university"] for a in agreements}),
-            "generatedAt": now,
-        })
-
-    (SITE / "universities.json").write_text(
-        json.dumps(registry, ensure_ascii=False), encoding="utf-8")
-    print(f"universities.json: {len(registry)} üniversite", file=sys.stderr)
-    write_sitemap(registry)
+        families = Counter(a["iscedFamily"] for a in agreements if a["iscedFamily"])
+        out = {"generatedAt": now, "source": "live" if pull else "local-snapshot", **metadata,
+               "count": len(agreements), "countries": countries,
+               "iscedFamilies": [{"code": k, "tr": ISCED_FAMILY[k][0], "en": ISCED_FAMILY[k][1], "count": v}
+                                 for k, v in sorted(families.items())], "agreements": agreements}
+        target = SITE / f"data-{uid}.json"
+        previous = json.loads(target.read_text(encoding="utf-8")) if target.exists() else {"agreements": []}
+        report = {"id": uid, "previousCount": len(previous["agreements"]), "count": len(agreements),
+                  "sourceChanged": digest != old_source.get("sha256"), **record_delta(previous["agreements"], agreements)}
+        reports.append(report)
+        print(f"{uid}: {report['previousCount']} → {report['count']} kayıt · +{report['added']} / -{report['removed']} · kaynak {'değişti' if report['sourceChanged'] else 'aynı'}")
+        registry[uid] = {k: uni[k] for k in ("id", "nameTr", "nameEn", "abbr", "monogram", "creditTr", "creditEn", "hasGuide")}
+        if uni.get("countUnit"):
+            registry[uid]["countUnit"] = uni["countUnit"]
+        registry[uid].update({"sourceUrl": uni["listUrl"], "diffCount": sum(bool(a.get("sourceDiff")) for a in agreements),
+                              "count": len(agreements), "countries": len(countries),
+                              "universities": len({a["university"] for a in agreements}), "generatedAt": now, **metadata})
+        sources[uid] = source
+        pending.append((uni["local"], data, target, out))
+    if report_path:
+        Path(report_path).write_text(json.dumps({"checkedAt": now, "dryRun": dry_run, "universities": reports}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if dry_run:
+        print("Önizleme: kaynak dosyaları ve site değiştirilmedi.")
+        return reports
+    ordered = [registry[u["id"]] for u in UNIVERSITIES if u["id"] in registry]
+    catalogue["kaynaklar"] = [sources[u["id"]] for u in UNIVERSITIES if u["id"] in sources]
+    SITE.mkdir(parents=True, exist_ok=True)
+    for local, data, target, out in pending:
+        local.parent.mkdir(parents=True, exist_ok=True)
+        if pull:
+            local.write_bytes(data)
+        target.write_text(json.dumps(out, ensure_ascii=False), encoding="utf-8")
+    registry_path.write_text(json.dumps(ordered, ensure_ascii=False), encoding="utf-8")
+    catalogue_path.write_text(json.dumps(catalogue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    write_sitemap(ordered)
+    return reports
 
 
 ALAN_ADI = "https://exchangeatlas.org"
@@ -1042,8 +1217,16 @@ def check_guide_links():
 
 
 if __name__ == "__main__":
-    build(pull="--pull" in sys.argv)
+    cli = argparse.ArgumentParser(description="Anlaşma verisini doğrula ve üret")
+    cli.add_argument("--pull", action="store_true", help="Resmî kaynaklardan indir; başarısızsa dur")
+    cli.add_argument("--university", action="append", dest="university_ids", help="Yalnız bu kurum (tekrarlanabilir)")
+    cli.add_argument("--dry-run", action="store_true", help="Farkları göster, kaynak veya site dosyalarını değiştirme")
+    cli.add_argument("--report", type=Path, help="İnceleme raporunun JSON dosyası")
+    cli.add_argument("--check-links", action="store_true", help="Rehber bağlantılarını ayrıca kontrol et")
+    args = cli.parse_args()
     try:
-        check_guide_links()
-    except Exception as e:  # link kontrolü hiçbir koşulda build'i bozmasın (offline vb.)
-        print(f"rehber link kontrolü atlandı: {e}", file=sys.stderr)
+        build(args.pull, args.university_ids, args.dry_run, args.report)
+        if args.check_links:
+            check_guide_links()
+    except (ValueError, OSError, KeyError, BadZipFile) as error:
+        cli.exit(1, f"Veri üretilemedi: {error}\n")

@@ -1526,8 +1526,8 @@ class YayinaHazirlikIcerigi(unittest.TestCase):
         self.assertEqual(marmara["abbr"], "MÜ")
         self.assertEqual(marmara["monogram"], "MÜ")
         readme = (ROOT / "README.md").read_text(encoding="utf-8")
-        self.assertIn("| MÜ · Marmara Üniversitesi | 785 |", readme)
-        kaynak = (ROOT / "scripts" / "build_data.py").read_text(encoding="utf-8")
+        self.assertIn(f"| MÜ · Marmara Üniversitesi | {marmara['count']} |", readme)
+        kaynak = (ROOT / "config" / "universities.json").read_text(encoding="utf-8")
         self.assertIn('"abbr": "MÜ"', kaynak)
         self.assertNotIn('"abbr": "Marmara"', kaynak)
 
@@ -1554,10 +1554,10 @@ class YayinaHazirlikIcerigi(unittest.TestCase):
         self.assertNotIn("1L lisans, 2YL yüksek lisans, D doktora anlamına gelir", html)
         self.assertNotIn("1L lisans, 2YL yüksek lisans, D doktora anlamına gelir", js)
 
-    def test_tarih_etiketi_uretim_zamanini_soyluyor(self):
+    def test_kaynak_kontrolu_uretim_zamanindan_ayri(self):
         home = (ROOT / "site" / "home.js").read_text(encoding="utf-8")
         app = (ROOT / "site" / "app.js").read_text(encoding="utf-8")
-        self.assertIn("Veri üretimi: {d}", home)
-        self.assertIn("Data generated: {d}", home)
+        self.assertIn("atlasSourceInfo(u, lang)", home)
+        self.assertNotIn("u.generatedAt", home)
         self.assertIn("veri üretimi: ${d}", app)
         self.assertIn("data generated: ${d}", app)
