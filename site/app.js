@@ -15,6 +15,7 @@ const COUNTRY = {
   "FRANSA": { en: "France", flag: "🇫🇷" }, "HIRVATİSTAN": { en: "Croatia", flag: "🇭🇷" },
   "HOLLANDA": { en: "Netherlands", flag: "🇳🇱" }, "KUZEY MAKEDONYA": { en: "North Macedonia", flag: "🇲🇰" },
   "LETONYA": { en: "Latvia", flag: "🇱🇻" }, "LİTVANYA": { en: "Lithuania", flag: "🇱🇹" },
+  "LÜKSEMBURG": { en: "Luxembourg", flag: "🇱🇺" },
   "MACARİSTAN": { en: "Hungary", flag: "🇭🇺" }, "MALTA": { en: "Malta", flag: "🇲🇹" },
   "POLONYA": { en: "Poland", flag: "🇵🇱" }, "PORTEKİZ": { en: "Portugal", flag: "🇵🇹" },
   "ROMANYA": { en: "Romania", flag: "🇷🇴" }, "SIRBİSTAN": { en: "Serbia", flag: "🇷🇸" },
@@ -48,12 +49,16 @@ const I18N = {
     country: "Ülke", field: "ISCED alan", degree: "Derece",
     onlyQuota: "Sadece öğrenim kontenjanı",
     noResult: "Aramanıza uygun anlaşma bulunamadı.",
-    loadError: "Anlaşma listesi şu an yüklenemedi. Bu genelde geçici bir bağlantı sorunudur, sayfayı yenilemeyi deneyin. Site kapanmadı, veriler yerinde duruyor.",
+    loadError: "Anlaşma listesi şu an yüklenemedi. Sayfayı yenilemeyi deneyin; sorun sürerse resmî kaynak listeyi kontrol edin.",
     loadErrorSubject: "Exchange Atlas: liste yüklenmiyor",
     loadErrorWrite: "Sorun sürüyorsa bize yazın",
     results: "sonuç", showN: (n) => `${n} sonucu göster`,
-    alansiz: (n) => `Kaynak veride alanı belirtilmemiş ${n} anlaşma bu filtreye giremiyor.`,
+    alansiz: (n) => `Tek bir ISCED alanına atanamayan ${n} kayıt bu filtrede gösterilemiyor. Alan filtresini kaldırıp bölüm adıyla arayabilirsiniz.`,
     shared: "Ortak kontenjan",
+    sharedRows: "Birleştirilmiş hücrelerdeki kontenjanlar diğer bölüm satırlarıyla ortaktır; kartlardaki sayıları toplamayın.",
+    quotaUnits: "Öğrenci: kişi × ay; personel: kişi × gün.",
+    teaching: "Ders verme", training: "Eğitim alma",
+    graduate: "Lisansüstü", associate: "Ön lisans",
     diffCountryFixed: "Kaynak listede ülke {0} yazıyor; Erasmus kodu bu ülkeyi gösterdiği için düzeltildi.",
     diffCountryFilled: "Kaynak listede ülke boştu; Erasmus kodundan tamamlandı.",
     diffLevel: "İptal edildiği yazılı bir öğrenim kademesi listeden çıkarıldı. Kaynakta yazan: {0}",
@@ -76,7 +81,7 @@ const I18N = {
     readingGuideTitle: "Alanları nasıl okumalı?",
     readingGuideText: "Öğrenim, staj ve personel kontenjanları ayrı gösterilir. ÖL ön lisans, sayıdan sonra gelen L lisans, YL yüksek lisans, D doktora anlamına gelir (ör. 1L = bir lisans, 2YL = iki yüksek lisans kontenjanı). Yıldızlı derece rozetleri ortak kontenjanı gösterir. Geçerlilik tarihi kaynakta yazdığı biçimde verilir.",
     loadMore: (a, b) => `Daha fazla göster (${a} / ${b})`,
-    stats: { anlasma: "anlaşma", ulke: "ülke", uni: "üniversite", alan: "alan" },
+    stats: { anlasma: "anlaşma", kayit: "bölüm/alan kaydı", ulke: "ülke", uni: "üniversite", alan: "alan" },
     footer: (d, credit) => `${credit} · Erasmus+ ikili anlaşma listesi (veri üretimi: ${d}).`,
     independence: `<strong>Exchange Atlas bağımsız bir platformdur, resmî bir üniversite hizmeti değildir.</strong> Veri, üniversitelerin kamuya açık listelerinden derlenir ve o listelerle birebir aynı değildir: Okurken verdiğimiz kararlar kartlarda ⓘ ile işaretlidir, ayrıca hata da içerebilir. Bağlayıcı olan kurumun kendi listesidir. Resmî başvuru için üniversitenizin Erasmus+ koordinatörlüğüne, uluslararası ilişkiler birimine veya diğer ilgili birime danışın.`,
   },
@@ -88,12 +93,16 @@ const I18N = {
     country: "Country", field: "ISCED field", degree: "Degree",
     onlyQuota: "Only with study places",
     noResult: "No agreement matches your search.",
-    loadError: "The agreement list could not be loaded right now. This is usually a temporary connection issue — try reloading the page. The site is not down and the data is still there.",
+    loadError: "The agreement list could not be loaded right now. Try reloading the page; if the problem persists, consult the official source list.",
     loadErrorSubject: "Exchange Atlas: list not loading",
     loadErrorWrite: "Write to us if it keeps happening",
     results: "results", showN: (n) => `Show ${n} results`,
-    alansiz: (n) => `${n} agreements have no field code in the source data and cannot appear in this filter.`,
+    alansiz: (n) => `${n} records could not be assigned to a single ISCED field and cannot appear in this filter. Clear the field filter to search by department name.`,
     shared: "Shared quota",
+    sharedRows: "Quotas in merged source cells are shared with other department rows; do not add the card totals.",
+    quotaUnits: "Students: people × months; staff: people × days.",
+    teaching: "Teaching", training: "Training",
+    graduate: "Graduate", associate: "Associate",
     diffCountryFixed: "The source list says {0}; corrected because the Erasmus code indicates this country.",
     diffCountryFilled: "The source list left the country blank; filled in from the Erasmus code.",
     diffLevel: "A study level marked as cancelled in the source was removed. The source reads: {0}",
@@ -114,7 +123,7 @@ const I18N = {
     readingGuideTitle: "How should I read these fields?",
     readingGuideText: "Study, traineeship and staff quotas are shown separately. ÖL means associate, while a number followed by L means bachelor's, YL master's and D doctoral places (e.g. 1L = one bachelor's place, 2YL = two master's places). Starred degree badges indicate shared quotas. Validity is shown as written in the source.",
     loadMore: (a, b) => `Show more (${a} / ${b})`,
-    stats: { anlasma: "agreements", ulke: "countries", uni: "universities", alan: "fields" },
+    stats: { anlasma: "agreements", kayit: "department / field records", ulke: "countries", uni: "universities", alan: "fields" },
     footer: (d, credit) => `${credit} — Erasmus+ bilateral agreements list (data generated: ${d}).`,
     independence: `<strong>Exchange Atlas is an independent platform, not an official university service.</strong> Data is compiled from universities' publicly available lists and is not identical to them: the decisions we made while reading are marked with ⓘ on each card, and errors are possible. The institution's own list is the authoritative one. For official applications, contact your university's Erasmus+ coordination office, international relations office, or another relevant office.`,
   },
@@ -231,7 +240,7 @@ function cizSourceNotice() {
 function buildStatRow() {
   const uni = new Set(DATA.agreements.map((a) => a.university)).size;
   const s = [
-    [DATA.count, "anlasma"], [DATA.countries.length, "ulke"], [uni, "uni"],
+    [DATA.count, UNI.countUnit === "department-row" ? "kayit" : "anlasma"], [DATA.countries.length, "ulke"], [uni, "uni"],
   ];
   // "0 alan" okunduğunda veri kaybı gibi görünüyor, oysa kaynakta o bilgi hiç
   // yok. Sıfır olduğunda sayı gösterilmiyor · sebebi alan süzgecinde yazılı.
@@ -331,6 +340,10 @@ function clearAll() {
 
 /* ── filtering ──────────────────────────── */
 function hasStudyQuota(a) {
+  if (a.quotaFormat === "person-duration") return [a.quotaStudy, a.quotaGraduate, a.quotaAssociate].some((v) => {
+    const n = String(v || "").match(/\d+/);
+    return n && Number(n[0]) > 0;
+  });
   const n = parseInt(a.quotaStudy, 10);
   if (!isNaN(n) && n > 0) return true;
   return Object.values(a.levels || {}).some((v) => v === "shared" || parseInt(v, 10) > 0);
@@ -480,10 +493,17 @@ function card(a) {
   }).join("");
 
   const quota = [];
-  if (parseInt(a.quotaStudy, 10) > 0) quota.push(`<span class="chip chip-quota">${L.study} · ${esc(a.quotaStudy)}</span>`);
-  if (parseInt(a.quotaInternship, 10) > 0) quota.push(`<span class="chip chip-quota">${L.intern} · ${esc(a.quotaInternship)}</span>`);
-  const staff = parseInt(a.quotaStaffTeach, 10) || parseInt(a.quotaStaffTrain, 10);
-  if (staff > 0) quota.push(`<span class="chip chip-quota">${L.personnel} · ${staff}</span>`);
+  if (a.quotaFormat === "person-duration") {
+    [[L.study, a.quotaStudy], [L.intern, a.quotaInternship], [L.teaching, a.quotaStaffTeach], [L.training, a.quotaStaffTrain]].forEach(([label, value]) => {
+      if (value && value !== "0") quota.push(`<span class="chip chip-quota">${esc(label)} · ${esc(value)}</span>`);
+    });
+  } else {
+    if (parseInt(a.quotaStudy, 10) > 0) quota.push(`<span class="chip chip-quota">${L.study} · ${esc(a.quotaStudy)}</span>`);
+    if (parseInt(a.quotaInternship, 10) > 0) quota.push(`<span class="chip chip-quota">${L.intern} · ${esc(a.quotaInternship)}</span>`);
+    // Keep both source columns and their shared-quota notes visible.
+    if (parseInt(a.quotaStaffTeach, 10) > 0) quota.push(`<span class="chip chip-quota">${L.teaching} · ${esc(a.quotaStaffTeach)}</span>`);
+    if (parseInt(a.quotaStaffTrain, 10) > 0) quota.push(`<span class="chip chip-quota">${L.training} · ${esc(a.quotaStaffTrain)}</span>`);
+  }
 
   // The source gives the language requirement as one string ("Eng. B1"); we do
   // not parse it.
@@ -496,7 +516,13 @@ function card(a) {
     ? `${esc(a.validity.raw)}${bitmisMi(a.validity.raw) ? ` <span class="expired">${L.expired}</span>` : ""}`
     : "";
   // The real note from the source sheet wins: it can be critical ("applies only to X")
-  const noteText = a.quotaNote ? esc(oneLine(a.quotaNote)) : (a.sharedQuota ? L.shared : "");
+  const noteText = [
+    a.quotaNote ? esc(oneLine(a.quotaNote)) : "",
+    a.quotaGraduate && a.quotaGraduate !== "0" ? L.graduate + ": " + esc(a.quotaGraduate) : "",
+    a.quotaAssociate && a.quotaAssociate !== "0" ? L.associate + ": " + esc(a.quotaAssociate) : "",
+    a.sharedQuota ? L.sharedRows : "",
+    a.quotaFormat === "person-duration" ? L.quotaUnits : ""
+  ].filter(Boolean).join(" · ");
   const note = noteText ? `<span class="note">${noteText}</span>` : "";
 
   const extIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>`;
@@ -510,6 +536,7 @@ function card(a) {
     <h3 class="uni">${esc(oneLine(a.university))}</h3>
     ${a.department ? `<p class="dept">${esc(oneLine(a.department))}</p>` : ""}
     ${fam ? `<div class="isced-line"><span class="chip chip-isced">${esc(fam)}${a.iscedCode ? ` · ${esc(a.iscedCode)}` : ""}</span></div>` : ""}
+    ${a.sourceField && oneLine(a.sourceField) !== oneLine(a.department) ? `<p class="dept">${esc(oneLine(a.sourceField))}</p>` : ""}
     ${(degrees || quota.length || langs.length) ? `<div class="badges">${degrees}${quota.join("")}${langs.join("")}</div>` : ""}
     <div class="meta-row"><span>${metaLeft}</span>${note}</div>
     ${sourceNote(a)}
@@ -532,10 +559,14 @@ function setLang(l) {
 
 function applyLang() {
   const L = t();
+  cizSourceNotice();
   document.querySelectorAll("[data-i18n]").forEach((e) => { const k = e.dataset.i18n; if (L[k]) e.textContent = L[k]; });
   document.querySelectorAll("[data-i18n-ph]").forEach((e) => { const k = e.dataset.i18nPh; if (L[k]) { e.placeholder = L[k]; e.setAttribute("aria-label", L[k]); } });
   document.querySelectorAll("[data-stat]").forEach((e) => { e.textContent = L.stats[e.dataset.stat]; });
   const credit = lang === "en" ? UNI.creditEn : UNI.creditTr;
+  const source = atlasSourceInfo(DATA, lang);
+  $("#sourceFreshness").textContent = [source.dateText, source.statusText].filter(Boolean).join(" · ");
+  $("#sourceFreshness").classList.toggle("source-stale", source.stale);
   const t3 = document.querySelector(".brand-text .t3");
   if (t3) t3.textContent = credit;
   // The independence notice is the first footer line on all three pages (guarded by tests).

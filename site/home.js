@@ -12,16 +12,12 @@
   var YUKLEME_HATASI = false;
   // adres bot taramasına karşı parçalı tutulur
   function adres() { return "burhanarikan" + "@" + "yaani" + ".com"; }
-  var MONTHS = {
-    tr: ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"],
-    en: ["January","February","March","April","May","June","July","August","September","October","November","December"]
-  };
   var TPL = {
     stats: { tr: "{c} anlaşma · {u} partner üniversite · {n} ülke", en: "{c} agreements · {u} partner universities · {n} countries" },
-    updated: { tr: "Veri üretimi: {d}", en: "Data generated: {d}" },
+    statsRows: { tr: "{c} bölüm/alan kaydı · {u} partner üniversite · {n} ülke", en: "{c} department/field records · {u} partner universities · {n} countries" },
     loadError: {
-      tr: "Üniversite listesi şu an yüklenemedi. Bu genelde geçici bir bağlantı sorunudur, sayfayı yenilemeyi deneyin. Site kapanmadı, veriler yerinde duruyor.",
-      en: "The university list could not be loaded right now. This is usually a temporary connection issue, try reloading the page. The site is not down and the data is still there."
+      tr: "Üniversite listesi şu an yüklenemedi. Sayfayı yenilemeyi deneyin; sorun sürerse bize yazabilirsiniz.",
+      en: "The university list could not be loaded right now. Try reloading the page; if the problem persists, you can contact us."
     },
     loadErrorWrite: { tr: "Sorun sürüyorsa bize yazın", en: "Write to us if it keeps happening" },
     loadErrorSubject: {
@@ -83,8 +79,7 @@
     if (YUKLEME_HATASI) { ghost.parentNode.insertBefore(hataKarti(), ghost); return; }
     if (!UNIS) return;
     UNIS.forEach(function (u) {
-      var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(u.generatedAt || "");
-      var date = m ? (parseInt(m[3], 10) + " " + MONTHS[lang][parseInt(m[2], 10) - 1] + " " + m[1]) : "";
+      var source = atlasSourceInfo(u, lang);
       var a = document.createElement("a");
       a.className = "uni-card";
       a.href = "agreements.html?uni=" + encodeURIComponent(u.id);
@@ -93,8 +88,9 @@
         '<span class="uni-body">' +
           '<span class="uni-name">' + esc(lang === "en" ? u.nameEn : u.nameTr) + '</span>' +
           '<span class="uni-abbr">' + esc(u.abbr) + '</span>' +
-          '<span class="uni-stats">' + TPL.stats[lang].replace("{c}", u.count).replace("{u}", u.universities).replace("{n}", u.countries) + '</span>' +
-          (date ? '<span class="uni-updated">' + TPL.updated[lang].replace("{d}", date) + '</span>' : "") +
+          '<span class="uni-stats">' + (u.countUnit === "department-row" ? TPL.statsRows : TPL.stats)[lang].replace("{c}", u.count).replace("{u}", u.universities).replace("{n}", u.countries) + '</span>' +
+          '<span class="uni-updated">' + esc(source.dateText) + '</span>' +
+          (source.stale ? '<span class="source-stale">' + esc(source.statusText) + '</span>' : "") +
         '</span>' +
         '<span class="uni-go" aria-hidden="true">→</span>';
       ghost.parentNode.insertBefore(a, ghost);

@@ -13,17 +13,18 @@ anlaşma listelerini öğrencinin arayabileceği bir listeye çeviriyor. Veriyi 
 Bu, bir sorumluluk doğuruyor: Okurken bazı kararlar vermek zorunda kalıyoruz ve o
 kararlar öğrencinin gördüğü şeyi değiştiriyor. **Hepsi burada yazılı.**
 
-Şu an platformda **üç kurum** var. Kaynakların indirme tarihleri kurum bazında
+Şu an platformda **dört kurum** var. Kaynakların indirme tarihleri kurum bazında
 değişiyor ve her biri [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da
 yazılı. Listenizi ilgili tarihten sonra güncellediyseniz sayılar değişmiş olabilir.
 
-| Kurum | Anlaşma | Listenin biçimi |
+| Kurum | Yayımlanan kayıt | Listenin biçimi |
 |---|---|---|
 | Burdur Mehmet Akif Ersoy Üniversitesi | 468 | Tek sayfa, 19 sütun |
-| Marmara Üniversitesi | 785 | 27 sayfa, fakülte başına bir sayfa |
+| Marmara Üniversitesi | 790 | 27 sayfa, fakülte başına bir sayfa |
 | Eskişehir Osmangazi Üniversitesi | 259 | Tek sayfa, fakülte blokları hâlinde |
+| Bilecik Şeyh Edebali Üniversitesi | 207 bölüm/alan satırı | İlk sayfa, birleştirilmiş anlaşma ve bölüm hücreleri |
 
-**Üç liste birbirinden çok farklı** ve bu beklenen bir şey · her kurum kendi
+**Listeler birbirinden farklı** ve bu beklenen bir şey · her kurum kendi
 tablosunu kendi ihtiyacına göre kuruyor. Aşağıdaki bölümler ayrımları
 gösteriyor; sayılar aksi yazmadıkça MAKÜ listesinden.
 
@@ -40,15 +41,15 @@ gösteriyor; sayılar aksi yazmadıkça MAKÜ listesinden.
 | G | Açıklama | Kontenjan notu olarak gösteriyoruz |
 | H | İkili Anlaşma Yapılan Bölüm Ders Alan Kodu (ISCED) | Bölüm adı olarak gösteriyoruz |
 | I | Ders Alan Kodu | ISCED kodu olarak okuyoruz |
-| J | Eğitim Dili | Kartta dil şartı olarak gösteriyoruz |
+| J | Eğitim Dili | Kaynakta yazdığı biçimde gösteriyoruz; ek bir dil şartı üretmiyoruz |
 | K | Öğrenim Kademesi (EQF) | Ön lisans / lisans / yüksek lisans / doktora rozetlerine çeviriyoruz |
 | L | Ülke | Filtrede ülke olarak kullanıyoruz |
 | M, N, O, P | Kontenjanlar | Öğrenim ve personel kontenjanı olarak gösteriyoruz |
-| Q, R | İmzalayan, e-posta | **Okumuyoruz** · aşağıda [§6](#6--neyi-düzeltmiyoruz) |
+| Q, R | İmzalayan, e-posta | **Okumuyoruz** · aşağıda [§5](#5--kişisel-veriyi-neden-okumuyoruz) |
 | S | İmzalandığı Tarih | Okumuyoruz |
 
 **Kaynak tablonuza hiç dokunmuyoruz.** Ama gösterirken bazı yerlerde ondan
-ayrılıyoruz ve bunu saklamak doğru olmaz. Bugün dört yerde ayrılıyoruz:
+ayrılıyoruz ve bunu saklamak doğru olmaz. MAKÜ listesindeki başlıca ayrımlar:
 
 | Ne yapıyoruz | Kaç yerde |
 |---|---|
@@ -67,7 +68,8 @@ Her birinin gerekçesi [§3](#3--okurken-verdiğimiz-kararlar)'te yazılı.
 > *"Kaynak listede ülke Romanya yazıyor, Erasmus kodu bu ülkeyi gösterdiği için
 > düzeltildi."*
 >
-> Bugün yedi kartta görünüyor. Gizlemek, "veriyi üniversiteden çekiyoruz"
+> Fark taşıyan kayıt sayısı her kurumun liste sayfasında gösterilir.
+> Gizlemek, "veriyi üniversiteden çekiyoruz"
 > iddiasıyla çelişirdi: Çekiyoruz, ama okurken bazı kararlar veriyoruz.
 >
 > **Bir ayrımın izi bilerek yok:** Bölüm adının başındaki kodun ayrılması. 465
@@ -332,10 +334,10 @@ değiştiririz.
 | Türkçe adı olmayan satır | İngilizce etiketi **gösteriyoruz** | Boş bırakmaktan iyi |
 | Bölüm adının önündeki kod | Addan **ayırıyoruz** | Kart üzerinde kod ayrı bir rozet olarak duruyor |
 
-Bir karar daha var ve bu bir sınır: **Alan kodu bilinmeyen kayıtlar, alan filtresi
-açıkken listeden düşüyor.** Bunu gizlemiyoruz, sayfada şöyle bir uyarı çıkıyor:
-*"Kaynak veride alanı belirtilmemiş N anlaşma bu filtreye giremiyor."* MAKÜ
-listesinde bu sayı **1**.
+Bir karar daha var ve bu bir sınır: **Tek bir ISCED alanına atanamayan kayıtlar,
+alan filtresi açıkken listeden düşüyor.** Sayfa kaç kaydın bu nedenle
+gösterilemediğini bildiriyor ve alan filtresini kaldırıp bölüm adıyla aramayı
+öneriyor. MAKÜ listesinde alan kodu bulunmayan **1** kayıt var.
 
 ### 3.1 · Marmara ve ESOGÜ listelerinde alan kodu hiç yok
 
@@ -401,6 +403,24 @@ kontenjanları **18** ile **2**.
 Bir satırda bölüm boştu, fakülte doluydu. Anlaşma fakülte geneline ait
 görünüyor, o yüzden fakülte adını gösteriyoruz **ve iz bırakıyoruz** · öğrenci
 bunun bir bölüm adı olmadığını görebiliyor.
+
+### 3.7 · MAKÜ personel kontenjanlarında iki sütun ayrı gösteriliyor
+
+20 Eylül 2026 incelemesinde resmî dosya mevcut kopyayla aynıydı: 468 kayıt,
+184 farklı partner adı, 20 ülke. Bütün kayıtların dört kontenjan sütunu ve
+eğitim dili, kaynak hücrelerle karşılaştırıldı; JSON'da bu alanlar eksiksizdi.
+
+Kartlarda ise ders verme ve eğitim alma tek bir "Personel" sayısına
+indirgeniyordu. İkinci sütun ve personel hücrelerindeki açıklamalar görünmüyordu.
+Gösterim düzeltildi: iki hareketlilik ayrı etiketleniyor ve hücre metni korunuyor.
+Örneğin `BG SOFIA22` Bilgisayar Mühendisliği satırında ders verme **2**,
+eğitim alma **5** ve bu 5 kişinin dört bölüm için toplam kontenjan olduğu
+notu birlikte gösteriliyor. `RO IASI03` Veterinerlik satırında da ders verme
+**4**, eğitim alma **2** olarak ayrı görünüyor. Kontenjanlar toplanmıyor.
+
+Kaynakta eğitim dili boş olan 16 kayda dil koşulu eklenmedi. Üstü çizili bir
+satırın yayımlanmaması, iptal edilen yüksek lisans kademesinin çıkarılması ve
+süresi geçmiş görünen üç kaydın uyarıyla korunması da yeniden denetlendi.
 
 ---
 
@@ -468,3 +488,36 @@ belirsizlikleri **yazılı bir kararla** çözüyoruz. Böylece bir gün "bu ned
 görünüyor" diye sorulduğunda cevabı hazır oluyor.
 
 Kararlarımızın hepsi bu belgede ve **başka bir yere bakmak gerekmiyor.**
+
+
+## 7 · Kaynak kontrolü ve Bilecik pilotu
+
+20 Eylül 2026 kontrolünde MAKÜ ve ESOGÜ Excel dosyalarının SHA-256 özetleri
+önceki dosyalarla aynıydı. Marmara'nın herkese açık paylaşımındaki 14 Eylül
+2026 dosyası 790 kayıt üretiyor. Beş yeni kayıt ve bir mevcut kayıtta içerik
+farkı var. Dosya indirme ve kaynak kontrol tarihleri ayrı tutulur; JSON'u yeniden
+üretmek kaynak kontrol tarihini ilerletmez. Süreç [`VERI-BAKIMI.md`](VERI-BAKIMI.md)'de.
+
+Bilecik Şeyh Edebali Üniversitesi'nin [resmî anlaşma sayfasındaki](https://bilecik.edu.tr/uluslararasi/Icerik/Anla%C5%9Fmalar_95fd9)
+Excel'in ilk sayfası okunur. 79 anlaşma grubu, 79 farklı partner adı
+ve 207 bölüm/alan satırı vardır. Sitedeki 207 bölüm/alan kaydı bu satırları ifade eder;
+207 bağımsız anlaşma veya kontenjan anlamına gelmez.
+
+- Birleştirilmiş hücreler yalnız Excel'de belirtilen sınırları içinde açılır.
+  Gerçekten boş hücreye önceki satırın bölümü taşınmaz.
+- Bölüm boşsa fakülte adı, o da boşsa kaynak alan etiketi gösterilir ve karta
+  açıklama eklenir. Dil koşulu kaynakta bulunmadığı için üretilmez.
+- Ülke/şehir hücresinden ülke alınır; Latvia, luxembourg ve Çek Cumhuriyeti
+  adları sırasıyla Letonya, Lüksemburg ve Çekya olarak gösterilir. Yalnız şehir
+  adı Plovdiv yazan iki satırda ülke Erasmus kodundan Bulgaristan olarak
+  tamamlanır; kaynaktaki Plovdiv metni kartın açıklamasında korunur.
+- Öğrenci kontenjanı kişi × ay, personel kontenjanı kişi × gün biçimindedir;
+  çarpım hesaplanıp öğrenci sayısı sanılmaz. Ders verme ve eğitim alma ayrı
+  gösterilir. Lisansüstü ve ön lisans sütunlarının değerleri notta korunur.
+- Birleştirilmiş kontenjan hücreleri ortak kontenjandır. Bunlar birden çok
+  bölüm kartında görünür; kartların sayılarını toplamak doğru değildir.
+- Aynı alan hücresinde farklı ISCED aileleri varsa tek aile seçilmez. `912`
+  ve `688` gibi standart dışı kodlar da tahminle sınıflandırılmaz. Alanın tam
+  kaynak metni gösterilir ve aranabilir; bu satırlar alan filtresinde görünmez.
+- Kaynağın iletişim sütunu okunmaz. Diğer sayfalar anlaşma tablosu olmadığı
+  için bu listeye katılmaz.

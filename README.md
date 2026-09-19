@@ -20,12 +20,16 @@ ve geri dönüş prosedürü [`README-DEPLOY.md`](README-DEPLOY.md)'de yazılıd
 | Üniversite | Anlaşma | Kaynak |
 |---|---|---|
 | MAKÜ · Burdur Mehmet Akif Ersoy Üniversitesi | 468 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
-| MÜ · Marmara Üniversitesi | 785 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
+| MÜ · Marmara Üniversitesi | 790 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
 | ESOGÜ · Eskişehir Osmangazi Üniversitesi | 259 | Uluslararası İlişkiler Birimi'nin kamuya açık ikili anlaşma listesi |
+| BŞEÜ · Bilecik Şeyh Edebali Üniversitesi | 207 | Uluslararası İlişkiler Ofisi Koordinatörlüğü'nün kamuya açık anlaşma listesi |
 
 Kaynak çekim tarihleri kurum bazında değişir; her dosyanın tarihi, özeti ve yapısı
 [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da yazılıdır. Üretilen JSON'un
-`generatedAt` alanı ise son veri üretim zamanını gösterir.
+`generatedAt` alanı ise son veri üretim zamanını gösterir. Sitede kaynağın son
+kontrol tarihi gösterilir; 30 günü aşan kaynaklar yeniden kontrol uyarısı taşır.
+Bilecik sayısı bölüm/alan satırlarını kapsar; ortak kontenjanlar kartlarda belirtilir.
+Yenileme ve kurum ekleme adımları: [`VERI-BAKIMI.md`](VERI-BAKIMI.md).
 
 Yeni üniversiteler topluluk katkılarıyla eklenecek · katkıda bulunmak için [aşağıya](#katkı) bakın.
 
@@ -146,11 +150,13 @@ Yaptığı şey **ileride konulmasını** engellemek.
 python3 -m unittest discover tests
 ```
 
-Kurulum yok, bağımlılık yok, ağ yok. Beş dosya, işlerine göre ayrılmış:
+Önce `python3 -m pip install -r requirements.txt` çalıştırın; JavaScript
+kontrolleri için Node.js gerekir. Testler ağ kullanmaz. Dosyalar işlerine göre ayrılmış:
 
 | Dosya | Ne denetliyor |
 |---|---|
 | `test_veri.py` | Kaynak veri ve üretilen JSON doğru mu |
+| `test_refresh.py` | Başarısız yenilemede dosyalar korunuyor mu, kaynak tarihleri doğru mu |
 | `test_site.py` | İki dil, marka, erişilebilirlik, renk, sıfır dış istek |
 | `test_belgeler.py` | Belgelerdeki bağlantılar, sayılar ve yazım |
 | `test_yayin.py` | Yayın önkoşulları · biri eksikse yayını durdurur |
@@ -158,9 +164,9 @@ Kurulum yok, bağımlılık yok, ağ yok. Beş dosya, işlerine göre ayrılmı�
 
 ## Yeni üniversite eklemek
 
-`scripts/build_data.py` içindeki `UNIVERSITIES` listesine kayıt + o
-üniversitenin Excel formatı için bir ayrıştırıcı işlev. Giriş sayfası kartı
-kendiliğinden gelir.
+`config/universities.json` içine kurum kaydı ve o üniversitenin Excel biçimi
+için bir ayrıştırıcı işlev eklenir. Giriş sayfası kartı, kaynak künyesi ve sitemap
+kendiliğinden üretilir. Adımlar ve Bilecik pilotu: [`VERI-BAKIMI.md`](VERI-BAKIMI.md).
 
 Veri güncelleme tek komut ve **bakımcının makinesinde** çalışır, sunucuda
 değil:
@@ -221,7 +227,7 @@ Kapsam dışında kalanlar ve sebepleri [`NOTICE.md`](NOTICE.md)'de: Yazı tiple
 | Ürün durumu | Yayında; canonical site [exchangeatlas.org](https://exchangeatlas.org) adresidir. |
 | Kurulum / çalıştırma | `site/` içeriğini statik bir sunucuya kopyalayın. Yerel önizleme için `python3 -m http.server 8765 --directory site` kullanın. |
 | Veri üretimi | Kaynak verileri yeniden çekmek ve JSON üretmek için `python3 scripts/build_data.py --pull` çalıştırılır. Kaynak künyeleri `site/kaynak-kunyesi.json` içinde tutulur. |
-| Kalite kapısı | `python3 -m pytest`; yayın öncesi ayrıca `README-DEPLOY.md` adımlarını ve `git diff --check` kontrolünü uygulayın. |
+| Kalite kapısı | `python3 -m unittest discover -s tests`; yayın öncesi ayrıca `README-DEPLOY.md` adımlarını ve `git diff --check` kontrolünü uygulayın. |
 | Desteklenen dağıtım | Modern tarayıcı + herhangi bir statik hosting; uygulama sunucusu, veritabanı ve runtime API’si gerekmez. |
 | Gizlilik / güvenlik | Çerezsiz ve izleme içermeyen, çalışma anında dış istek yapmayan salt okunur site. Güvenlik bildirimleri [`SECURITY.md`](SECURITY.md) üzerinden yapılır. |
 | Bilinen sınırlar | Veri güncelliği, kurum bazlı kaynak tarihleri ve mevcut üniversite kapsamı kaynak dosyalarına bağlıdır; canlı veri toplama runtime’da yapılmaz. |

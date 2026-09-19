@@ -8,6 +8,14 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+- Kaynak kontrol tarihi veri üretim tarihinden ayrıldı; 30 günü aşan kaynaklarda yeniden kontrol uyarısı gösteriliyor.
+- Dört kurumun resmî Excel dosyaları otomatik indirilebiliyor. Yenilemeye kurum seçimi, önizleme ve JSON fark raporu eklendi; başarısız indirme eski veriyi değiştirmiyor.
+- Kurum tanımları `config/universities.json` içine taşındı; veri bakımı ve yeni kurum ekleme rehberi eklendi.
+- Marmara'nın 14 Eylül 2026 dosyasıyla kayıt sayısı 785'ten 790'a çıktı.
+- Bilecik Şeyh Edebali Üniversitesi 207 bölüm/alan kaydıyla eklendi; ortak kontenjanlar ve kişi × süre gösterimi korunuyor.
+- Alan filtresi ve yükleme hatası açıklamaları doğrulanamayan iddialardan arındırıldı; bakımda korunacak sözler belgelendi ve Bilecik iletişim sütununa erişimi engelleyen denetim eklendi.
+- MAKÜ incelemesinde personel kontenjanlarının kartta eksik gösterildiği bulundu: ders verme ve eğitim alma artık ayrı, kaynak hücresindeki ortak kontenjan açıklamalarıyla gösteriliyor.
+
 - Ana sayfa, anlaşma listesi, rehber ve LinkedIn paylaşım alias’ı footer’larına public GitHub repository bağlantısı eklendi.
 
 ## [1.0.0] - 2026-08-24

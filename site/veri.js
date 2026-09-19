@@ -27,4 +27,25 @@
     });
   }
   global.atlasJson = atlasJson;
+  // Freshness is based on the source, never on JSON generation time.
+  global.atlasSourceInfo = function (record, lang, today) {
+    var en = lang === "en";
+    var raw = record.sourceCheckedAt || record.sourceDownloadedAt;
+    var time = /^\d{4}-\d{2}-\d{2}$/.test(raw || "") ? Date.parse(raw + "T00:00:00Z") : NaN;
+    var now = today == null ? Date.now() : today;
+    // Source dates have day precision; allow the builder/visitor timezone gap.
+    var valid = Number.isFinite(time) && time <= now + 86400000 && new Date(time).toISOString().slice(0, 10) === raw;
+    var stale = !valid || now - time > 30 * 86400000;
+    var label = valid ? new Intl.DateTimeFormat(en ? "en-GB" : "tr-TR", {
+      day: "numeric", month: "long", year: "numeric", timeZone: "UTC"
+    }).format(new Date(time)) : "";
+    var prefix = record.sourceCheckedAt
+      ? (en ? "Source checked: " : "Kaynak kontrolü: ")
+      : (en ? "Source retrieved: " : "Kaynak alındı: ");
+    return {
+      dateText: valid ? prefix + label : (en ? "Source check date unavailable" : "Kaynak kontrol tarihi bilinmiyor"),
+      stale: stale,
+      statusText: stale ? (en ? "A new source check is due; consult the official list." : "Kaynağın yeniden kontrolü gerekiyor; resmî listeye bakın.") : ""
+    };
+  };
 })(window);

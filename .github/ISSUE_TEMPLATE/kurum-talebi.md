@@ -13,11 +13,18 @@ labels: kurum
 
 - [ ] Düzeltme
 - [ ] Kaldırma
+- [ ] Yeni üniversite ekleme
+- [ ] Kaynak liste güncelleme
 - [ ] Başka
 
 ## Ayrıntı
 
 <Hangi kayıt ya da hangi bölüm>
+
+Yeni üniversite veya güncelleme için resmî anlaşma sayfasının bağlantısını,
+listenin kapsadığı Erasmus+ programını ve varsa dosyanın tarihini ekleyin.
+Kişisel iletişim bilgileri içeren Excel'i issue'ya yüklemek yerine kurumun
+kamuya açık kaynak bağlantısını paylaşın.
 
 ---
 
