@@ -8,6 +8,7 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+- Canlı kontrolde eski tarayıcı önbelleğinin yeni veriyi eski kodla gösterdiği görüldü; JS/CSS bağlantıları içerik özetiyle sürümleniyor, JSON yeniden doğrulanıyor. Canlı başlık denetimine önbellek ve NEL raporlama politikası eklendi.
 - Kaynak kontrol tarihi veri üretim tarihinden ayrıldı; 30 günü aşan kaynaklarda yeniden kontrol uyarısı gösteriliyor.
 - Dört kurumun resmî Excel dosyaları otomatik indirilebiliyor. Yenilemeye kurum seçimi, önizleme ve JSON fark raporu eklendi; başarısız indirme eski veriyi değiştirmiyor.
 - Kurum tanımları `config/universities.json` içine taşındı; veri bakımı ve yeni kurum ekleme rehberi eklendi.

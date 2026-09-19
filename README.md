@@ -147,6 +147,7 @@ Yaptığı şey **ileride konulmasını** engellemek.
 ## Testler
 
 ```bash
+python3 scripts/version_assets.py
 python3 -m unittest discover tests
 ```
 

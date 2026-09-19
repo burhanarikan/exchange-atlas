@@ -4,12 +4,17 @@ Bu belge, `site/` klasörünün Cloudflare Pages üzerinde güvenli biçimde yay
 
 ## 1. Yerel kalite kapısı
 
-Yayın öncesi kök dizinde şu komutların ikisi de hatasız tamamlanmalıdır:
+Yayın öncesi kök dizinde şu komutlar hatasız tamamlanmalıdır:
 
 ```bash
+python3 scripts/version_assets.py
 python3 -m unittest discover tests
 python3 -m unittest discover -s tests
 ```
+
+JS/CSS adreslerine dosya özetinden `?v=` sürümü eklenir. İçerik değişirse adres
+de değişir; test eski sürüm başvurusuyla yayını durdurur. JSON istekleri önbelleği
+sunucuyla yeniden doğrular. Bunlar yerel hazırlık adımlarıdır; yayın paketi statik kalır.
 
 Ardından yayın paketinde yalnızca `site/` içeriğinin yer alacağı kontrol edilir:
 
@@ -146,6 +151,28 @@ curl -s \
 Not: CSP (`script-src 'self'`) böyle bir betiği zaten bloklar, yani ziyaretçinin adresi üçüncü tarafa gitmez. Ama o zaman gizlilik sözü **tek bir satıra** bağlı kalır: CSP bir gün gevşetilirse izleme sessizce açılır. Beacon'ın kaynağında kapatılması, sözü iki katmanda birden tutuyor.
 
 ## 7. Manuel smoke-test
+
+### Önbellek ve ağ hata raporlama ayarları
+
+Cloudflare alan adında **Browser Cache TTL: Respect Existing Headers** seçilmelidir.
+Varsayılan dört saatlik süre, yeni JSON ile eski JavaScript'in birlikte görünmesine
+yol açabilir. `site/_headers` yeniden doğrulama için `Cache-Control: no-cache` gönderir.
+Kaynak: [Cloudflare tarayıcı önbelleği](https://developers.cloudflare.com/cache/how-to/edge-browser-cache-ttl/).
+
+**Network Error Logging (NEL) kapalı olmalıdır.** NEL, sayfaya betik eklemeden
+tarayıcıdan ağ hata raporu gönderebilir; yalnız HTML'de analitik aramak yeterli değildir.
+Cloudflare'ın alan adı ayarı kapatılır; `site/_headers` içindeki sıfır ömürlü NEL
+ve `cf-nel` Report-To başlıkları, daha önce saklanmış raporlama politikasını
+sonraki başarılı yanıtta temizler. Kaynaklar:
+[Cloudflare NEL](https://developers.cloudflare.com/network-error-logging/) ve
+[W3C NEL politika ömrü](https://www.w3.org/TR/network-error-logging/#the-max_age-member).
+
+```bash
+python3 scripts/check_live_headers.py
+```
+
+Bu denetim bütün kurum sayfaları, JSON verileri ve değişebilen JS/CSS yanıtlarında
+yeniden doğrulama ile raporlamanın kapalı olduğunu kontrol eder; ana dal CI'ında da çalışır.
 
 Yayınlanan adres üzerinde masaüstü ve mobil görünümde şu akışlar tamamlanır:
 
