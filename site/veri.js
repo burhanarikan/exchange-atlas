@@ -14,7 +14,7 @@
    doğru kalan tek yol. */
 (function (global) {
   function atlasJson(url) {
-    return fetch(url).then(function (res) {
+    return fetch(url, { cache: "no-cache" }).then(function (res) {
       if (!res.ok) {
         throw new Error("Veri isteği başarısız · HTTP " + res.status + " · " + url);
       }

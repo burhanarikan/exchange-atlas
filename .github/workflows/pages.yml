@@ -118,6 +118,11 @@ jobs:
     if: github.event_name != 'pull_request' && vars.LIVE_SITE_URL != ''
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+      - name: canlı önbellek ve ağ raporlama denetimi
+        env:
+          LIVE_SITE_URL: ${{ vars.LIVE_SITE_URL }}
+        run: python3 scripts/check_live_headers.py --base "$LIVE_SITE_URL"
       - name: canlı route ve güvenlik header denetimi
         env:
           LIVE_SITE_URL: ${{ vars.LIVE_SITE_URL }}

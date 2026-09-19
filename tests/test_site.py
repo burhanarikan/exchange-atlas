@@ -1216,7 +1216,7 @@ class VeriYuklemeBekcisi(unittest.TestCase):
         kusur = []
         for yol in sorted((ROOT / "site").glob("*.html")):
             metin = yol.read_text(encoding="utf-8")
-            betikler = re.findall(r'<script[^>]+src="([^"]+)"', metin)
+            betikler = [b.split("?", 1)[0] for b in re.findall(r'<script[^>]+src="([^"]+)"', metin)]
             sayfa_betigi = [b for b in betikler if b in self.SAYFA_BETIKLERI]
             if not sayfa_betigi:
                 continue

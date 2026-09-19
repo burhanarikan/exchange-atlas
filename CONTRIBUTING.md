@@ -72,6 +72,7 @@ anlatan kayıtlar taşıyor · çoğu bir kez gerçekten yaşanmış bir hatayı
 
 ```bash
 python3 -m pip install -r requirements.txt
+python3 scripts/version_assets.py
 python3 -m unittest discover -s tests
 ```
 
