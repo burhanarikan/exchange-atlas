@@ -23,6 +23,7 @@ class PublicDepoDokumantasyonu(unittest.TestCase):
         "CITATION.cff",
         ".github/PULL_REQUEST_TEMPLATE.md",
         ".github/dependabot.yml",
+        ".github/workflows/source-check.yml",
     )
 
     def test_public_depo_belgeleri_var(self):
@@ -62,6 +63,12 @@ class PublicDepoDokumantasyonu(unittest.TestCase):
         self.assertIn("name: Quality checks and live validation", metin)
         self.assertIn("LIVE_SITE_URL", metin)
         self.assertIn("vars.PAGES_ENABLED == 'true'", metin)
+
+    def test_kaynak_kontrol_workflowu_salt_okunur_ve_dry_run(self):
+        metin = (ROOT / ".github" / "workflows" / "source-check.yml").read_text(encoding="utf-8")
+        self.assertIn("contents: read", metin)
+        self.assertNotIn("contents: write", metin)
+        self.assertIn("python3 scripts/build_data.py --pull --dry-run --report", metin)
 
     def test_changelog_ilk_surumu_ve_unreleased_bolumunu_tasiyor(self):
         metin = (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")

@@ -141,6 +141,7 @@ jobs:
             '/agreements?uni=marmara' \
             '/agreements?uni=esogu' \
             '/agreements?uni=bilecik' \
+            '/agreements?uni=kku' \
             '/guide?uni=maku'; do
             echo "--- ${base}${path}"
             headers="$(curl --fail --silent --show-error --retry 8 --retry-delay 5 --retry-all-errors \

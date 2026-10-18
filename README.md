@@ -23,6 +23,7 @@ ve geri dönüş prosedürü [`README-DEPLOY.md`](README-DEPLOY.md)'de yazılıd
 | MÜ · Marmara Üniversitesi | 790 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
 | ESOGÜ · Eskişehir Osmangazi Üniversitesi | 259 | Uluslararası İlişkiler Birimi'nin kamuya açık ikili anlaşma listesi |
 | BŞEÜ · Bilecik Şeyh Edebali Üniversitesi | 207 | Uluslararası İlişkiler Ofisi Koordinatörlüğü'nün kamuya açık anlaşma listesi |
+| KKÜ · Kırıkkale Üniversitesi | 165 | Dış İlişkiler ve AB Koordinatörlüğü'nün kamuya açık KA131 listesi |
 
 Kaynak çekim tarihleri kurum bazında değişir; her dosyanın tarihi, özeti ve yapısı
 [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da yazılıdır. Üretilen JSON'un
@@ -168,6 +169,7 @@ kontrolleri için Node.js gerekir. Testler ağ kullanmaz. Dosyalar işlerine gö
 `config/universities.json` içine kurum kaydı ve o üniversitenin Excel biçimi
 için bir ayrıştırıcı işlev eklenir. Giriş sayfası kartı, kaynak künyesi ve sitemap
 kendiliğinden üretilir. Adımlar ve Bilecik pilotu: [`VERI-BAKIMI.md`](VERI-BAKIMI.md).
+Projenin başka bir kişiye, topluluğa veya kuruma devri için: [`DEVIR.md`](DEVIR.md).
 
 Veri güncelleme tek komut ve **bakımcının makinesinde** çalışır, sunucuda
 değil:

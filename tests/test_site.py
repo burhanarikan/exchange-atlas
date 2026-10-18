@@ -119,16 +119,20 @@ class AramaKatlamasiKapsami(unittest.TestCase):
                bugün veride üç tane var ve kabul edilmiş durumda.
     """
 
+    def veri_dosyalari(self):
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            self.skipTest("data-*.json yok")
+        return dosyalar
+
     def test_arama_metninde_cozulmemis_HARF_kalmiyor(self):
-        yol = ROOT / "site" / "data-maku.json"
-        if not yol.exists():
-            self.skipTest("data-maku.json yok")
         import unicodedata
         kalan = {}
-        for r in json.loads(yol.read_text(encoding="utf-8"))["agreements"]:
-            for c in r["search"]:
-                if ord(c) > 127 and unicodedata.category(c).startswith("L"):
-                    kalan[c] = kalan.get(c, 0) + 1
+        for yol in self.veri_dosyalari():
+            for r in json.loads(yol.read_text(encoding="utf-8"))["agreements"]:
+                for c in r["search"]:
+                    if ord(c) > 127 and unicodedata.category(c).startswith("L"):
+                        kalan[c] = kalan.get(c, 0) + 1
         self.assertEqual(
             kalan, {},
             f"Katlama bu harfleri çözemiyor: "
@@ -143,12 +147,10 @@ class AramaKatlamasiKapsami(unittest.TestCase):
         Yeni bir işaret çıkarsa haberimiz olsun diye. Kırıldığında yapılacak:
         gerçekten zararsız mı bak, öyleyse listeye ekle.
         """
-        yol = ROOT / "site" / "data-maku.json"
-        if not yol.exists():
-            self.skipTest("data-maku.json yok")
         import unicodedata
-        BILINEN = {"\u201c", "\u201d", "\u2013"}   # kıvrık tırnaklar, uzun tire
-        kalan = {c for r in json.loads(yol.read_text(encoding="utf-8"))["agreements"]
+        BILINEN = {"\u201c", "\u201d", "\u2013", "\u2019"}   # kıvrık tırnaklar, uzun tire
+        kalan = {c for yol in self.veri_dosyalari()
+                 for r in json.loads(yol.read_text(encoding="utf-8"))["agreements"]
                  for c in r["search"]
                  if ord(c) > 127 and not unicodedata.category(c).startswith("L")}
         yeni = kalan - BILINEN
@@ -999,10 +1001,6 @@ class EmojiEnvanteri(unittest.TestCase):
             + "\n\nArayüzden çıkarıldıysa listeden de çıkarılmalı.")
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class IcerikGuvenligiPolitikasi(unittest.TestCase):
     """Her sayfa CSP taşıyor ve politika ödün vermiyor.
 
@@ -1502,10 +1500,22 @@ class YayinaHazirlikIcerigi(unittest.TestCase):
 
     def test_rehberdeki_maku_sayisi_uretilen_veriyle_eslesiyor(self):
         unis = json.loads((ROOT / "site" / "universities.json").read_text(encoding="utf-8"))
-        maku = next(u for u in unis if u["id"] == "maku")
         metin = (ROOT / "site" / "guide.html").read_text(encoding="utf-8")
-        self.assertIn(f"yayımlanan {maku['count']}", metin)
-        self.assertIn(f"{maku['count']} published", metin)
+        self.assertIn('id="guideHero"', metin)
+        for u in unis:
+            if not u.get("hasGuide"):
+                continue
+            with self.subTest(uni=u["id"]):
+                blok = re.search(
+                    rf'<div class="uni-sec" data-uni="{re.escape(u["id"])}"[^>]*>(.*?)</div>\s*(?=<div class="uni-sec"|<!-- Rehberi)',
+                    metin,
+                    re.S,
+                )
+                self.assertIsNotNone(blok, f"guide.html içinde data-uni='{u['id']}' bölümü yok")
+                parca = blok.group(1)
+                self.assertIn(f"yayımlanan {u['count']}", parca)
+                self.assertIn(f"{u['count']} published", parca)
+                self.assertIn(f'href="agreements.html?uni={u["id"]}"', parca)
 
     def test_rehber_silinen_kaydi_ve_gerekcesini_acikliyor(self):
         metin = (ROOT / "site" / "guide.html").read_text(encoding="utf-8")
@@ -1561,3 +1571,7 @@ class YayinaHazirlikIcerigi(unittest.TestCase):
         self.assertNotIn("u.generatedAt", home)
         self.assertIn("veri üretimi: ${d}", app)
         self.assertIn("data generated: ${d}", app)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -36,7 +36,12 @@ Ayrıntısı `KAYNAK.md` belgesinde.
 - [Marmara anlaşma listesi](https://exchangeatlas.org/agreements?uni=marmara): Marmara Üniversitesi · 790 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
 - [ESOGÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=esogu): Eskişehir Osmangazi Üniversitesi · 259 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
 - [BŞEÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=bilecik): Bilecik Şeyh Edebali Üniversitesi · 207 bölüm/alan satırı; ortak kontenjanlar toplanmamalıdır
-- [MAKÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=maku): Öğrencinin izleyeceği adımlar ve kurumun ilgili birimine bağlantılar
+- [KKÜ anlaşma listesi](https://exchangeatlas.org/agreements?uni=kku): Kırıkkale Üniversitesi · 165 anlaşma. Aranabilir ve filtrelenebilir · ülke, öğrenim kademesi ve kontenjan
+- [MAKÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=maku): Burdur Mehmet Akif Ersoy Üniversitesi başvuru süreci ve resmî kaynak bağlantıları
+- [MÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=marmara): Marmara Üniversitesi başvuru süreci ve resmî kaynak bağlantıları
+- [ESOGÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=esogu): Eskişehir Osmangazi Üniversitesi başvuru süreci ve resmî kaynak bağlantıları
+- [BŞEÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=bilecik): Bilecik Şeyh Edebali Üniversitesi başvuru süreci ve resmî kaynak bağlantıları
+- [KKÜ başvuru rehberi](https://exchangeatlas.org/guide?uni=kku): Kırıkkale Üniversitesi başvuru süreci ve resmî kaynak bağlantıları
 
 ## Sınırlar
 

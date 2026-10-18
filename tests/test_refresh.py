@@ -204,6 +204,49 @@ class BilecikMergedSource(unittest.TestCase):
         self.assertEqual(bd.parse_bilecik(ws)[0]["levels"], {"lisans": "2"})
 
 
+class KkuSourceTest(unittest.TestCase):
+    """Kırıkkale ayrıştırıcısı başlık kaymasını yakalamalı ve akademik birimi korumalı."""
+    def sheet(self):
+        ws = openpyxl.Workbook().active
+        for col, label in bd.KKU_HEADERS.items():
+            ws.cell(2, col, label)
+        for col, val in {
+            2: "KA131", 3: "Eğitim Fakültesi", 4: "Tüm bölümler",
+            5: "University of Foggia", 6: "I FOGGIA03", 9: "İtalya", 10: "Foggia",
+            11: "-", 12: "-", 13: "4", 14: "10", 15: "1", 16: "9",
+            17: "-", 18: "-", 19: "2", 20: "1 Hafta", 21: "8 saat",
+        }.items():
+            ws.cell(3, col, val)
+        return ws
+
+    def test_parses_levels_quotas_and_academic_unit(self):
+        rows = bd.parse_kku(self.sheet())
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row["country"], "İTALYA")
+        self.assertEqual(row["department"], "Tüm bölümler")
+        self.assertEqual(row["sourceField"], "Eğitim Fakültesi")
+        self.assertEqual(row["levels"], {"lisans": "4", "yukseklisans": "1"})
+        self.assertEqual(row["quotaStudy"], "4L, 1YL")
+        self.assertEqual(row["quotaStaffTeach"], "2")
+        self.assertIn("foggia", row["search"])
+        self.assertIn("egitim fakultesi", row["search"])
+
+    def test_blank_department_falls_back_to_academic_unit_with_trace(self):
+        ws = self.sheet()
+        ws.cell(3, 4).value = None
+        row = bd.parse_kku(ws)[0]
+        self.assertEqual(row["department"], "Eğitim Fakültesi")
+        self.assertNotIn("sourceField", row)
+        self.assertEqual(row["sourceDiff"]["department"]["sebep"], "fakulte-adi")
+
+    def test_header_shift_stops_parser(self):
+        ws = self.sheet()
+        ws.cell(2, 13).value = "Yeni Başlık"
+        with self.assertRaisesRegex(ValueError, "başlığı değişti"):
+            bd.parse_kku(ws)
+
+
 class PublishedProvenance(unittest.TestCase):
     def test_registry_data_and_catalogue_agree(self):
         registry = json.loads((ROOT / "site/universities.json").read_text())

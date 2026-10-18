@@ -1,7 +1,7 @@
 # Veri bakımı ve yeni üniversite ekleme
 
 Üniversite kaydı [`config/universities.json`](config/universities.json) içinde,
-ayrıştırıcılar [`scripts/build_data.py`](scripts/build_data.py) içindedir.
+ayrıştırıcılar [`scripts/parsers/`](scripts/parsers/) altında (ve [`scripts/build_data.py`](scripts/build_data.py) üzerinden dışa aktarılarak) tutulur.
 Kaynak Excel dosyaları yalnız `lokal/` altında tutulur; yayımlanmaz.
 
 ## Kaynakları yenileme
@@ -79,9 +79,11 @@ başarılı yenileme kaynak kontrol tarihini kaydeder.
 
 ## Bakımda korunan sözler
 
-Kaynak kontrolü bakımcının makinesinde yürütülür. İleride düzenli kontrol
-kurulursa aynı sınır korunur: kontrol raporu hazırlanır, değişiklikler incelenir
-ve yayın ayrı adımda yapılır. Şu anda zamanlanmış kontrol kurulmuş değildir.
+Kaynak yenileme ve yayın bakımcının makinesinde yürütülür. Haftalık zamanlanmış
+kontrol iş akışı ([`.github/workflows/source-check.yml`](.github/workflows/source-check.yml))
+aynı sınırı korur: `contents: read` izniyle yalnız `--pull --dry-run --report`
+çalıştırır, kontrol raporunu üretir ve hiçbir kaynak/site dosyasını otomatik
+değiştirmez; değişiklikler incelenir ve yayın ayrı adımda yapılır.
 Siteye sunucu uygulaması, gizli anahtar, analitik veya çalışma anında dış
 istek eklenmez. Ham kaynak dosyaları ve kişisel iletişim sütunları yayımlanmaz.
 

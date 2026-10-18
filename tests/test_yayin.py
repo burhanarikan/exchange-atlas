@@ -252,6 +252,20 @@ class UniversiteEklemeOnKosulu(unittest.TestCase):
             f"Çözülmeden ikinci üniversite eklenmemeliydi; ya kullanıcıya bildirin "
             f"ya da üniversite seçimine yönlendirin.")
 
+    def test_rehberde_coklu_rehber_varken_sessiz_ilk_rehbere_dusus_yok(self):
+        yol = ROOT / "site" / "universities.json"
+        if not yol.exists():
+            self.skipTest("universities.json yok")
+        rehberli = [u for u in json.loads(yol.read_text(encoding="utf-8")) if u.get("hasGuide")]
+        if len(rehberli) <= 1:
+            return
+        kaynak = (ROOT / "site" / "guide.js").read_text(encoding="utf-8")
+        sessiz = re.search(r"unis\.find\([^)]*hasGuide[^)]*\)\s*\|\|\s*unis\[0\]", kaynak)
+        self.assertIsNone(
+            sessiz,
+            f"Platformda {len(rehberli)} rehber var ama ?uni= verilmediğinde guide.js "
+            f"sessizce ilk rehbere düşüyor; üniversite seçimine yönlendirmeli.")
+
 
 def _srgb(c):
     c = c / 255
@@ -406,3 +420,67 @@ class ResponseHeaderYapilandirmasi(unittest.TestCase):
         self.assertIn("script-src 'self'", metin)
         self.assertNotIn("unsafe-inline", metin)
         self.assertNotIn("unsafe-eval", metin)
+
+
+class DevirAraci(unittest.TestCase):
+    """`scripts/handover.py` kimlik/iletişim/alan adı tutarlılığını korumalı."""
+
+    def test_mevcut_depo_kimlik_butunlugu_tam(self):
+        import sys
+        if str(ROOT / "scripts") not in sys.path:
+            sys.path.insert(0, str(ROOT / "scripts"))
+        import handover
+
+        hatalar = handover.check_consistency(ROOT)
+        self.assertEqual(hatalar, [], f"Kimlik/iletişim/alan adı tutarsızlığı: {hatalar}")
+        self.assertTrue((ROOT / "DEVIR.md").exists(), "DEVIR.md devir rehberi eksik")
+
+    def test_devir_araci_gecici_kopyada_tum_dosyalari_gunceller(self):
+        import shutil
+        import sys
+        import tempfile
+        if str(ROOT / "scripts") not in sys.path:
+            sys.path.insert(0, str(ROOT / "scripts"))
+        import handover
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_root = Path(tmp)
+            kopyalanacak = set(
+                handover.REPO_FILES
+                + handover.PLAIN_EMAIL_FILES
+                + handover.DOMAIN_FILES
+                + (
+                    "LICENSE",
+                    "site/home.js",
+                    "site/guide.js",
+                    "site/veri.js",
+                    "site/styles.css",
+                    "site/tokens.css",
+                    "site/fonts.css",
+                    "site/favicon.svg",
+                    "tests/test_yayin.py",
+                )
+            )
+            for rel in kopyalanacak:
+                src = ROOT / rel
+                dst = tmp_root / rel
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(src, dst)
+
+            degisen = handover.apply_handover(
+                tmp_root,
+                new_repo="ornek-kurum/exchange-atlas",
+                new_email="erasmus@ornek.edu.tr",
+                new_author="Örnek Kurum",
+                new_domain="atlas.ornek.edu.tr",
+            )
+            self.assertGreater(len(degisen), 15)
+            self.assertEqual(handover.check_consistency(tmp_root), [])
+            yeni = handover.detect_current(tmp_root)
+            self.assertEqual(yeni["repo"], "ornek-kurum/exchange-atlas")
+            self.assertEqual(yeni["email"], "erasmus@ornek.edu.tr")
+            self.assertEqual(yeni["author"], "Örnek Kurum")
+            self.assertEqual(yeni["domain"], "atlas.ornek.edu.tr")
+            # Kurumsal e-postaya geçildiğinde kişisel sağlayıcı muafiyet listesi boşalmalı
+            yayin_metni = (tmp_root / "tests" / "test_yayin.py").read_text(encoding="utf-8")
+            self.assertIn("MUAF = ()", yayin_metni)
