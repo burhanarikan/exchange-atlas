@@ -33,8 +33,9 @@ def header_errors(headers):
 def check_live(base):
     """Bütün kurum sayfaları ve değişebilen kaynaklar gerçek yanıtlarıyla kontrol edilir."""
     universities = json.loads((ROOT / "config/universities.json").read_text(encoding="utf-8"))
-    paths = ["/", "/guide?uni=maku", "/universities.json", "/app.js", "/home.js", "/veri.js", "/styles.css"]
+    paths = ["/", "/universities.json", "/app.js", "/home.js", "/veri.js", "/styles.css"]
     paths += [f"/agreements?uni={uni['id']}" for uni in universities]
+    paths += [f"/guide?uni={uni['id']}" for uni in universities if uni.get("hasGuide")]
     paths += [f"/data-{uni['id']}.json" for uni in universities]
 
     def fetch(path):

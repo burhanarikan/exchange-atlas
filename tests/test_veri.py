@@ -171,36 +171,42 @@ class UretilenVeriTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        import json
-        yol = ROOT / "site" / "data-maku.json"
-        if not yol.exists():
-            raise unittest.SkipTest("data-maku.json yok; önce build_data.py çalıştırın")
-        cls.veri = json.loads(yol.read_text(encoding="utf-8"))
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            raise unittest.SkipTest("data-*.json yok; önce build_data.py çalıştırın")
+        cls.veriler = {yol.stem: json.loads(yol.read_text(encoding="utf-8")) for yol in dosyalar}
+        cls.veri = cls.veriler["data-maku"]
 
     def test_kayit_sayisi_beklenen_araliкta(self):
         # Kaynak liste güncellenince sayı değişir; ani düşüş bozulma işaretidir.
         self.assertGreater(self.veri["count"], 400)
-        self.assertEqual(self.veri["count"], len(self.veri["agreements"]))
+        for ad, veri in self.veriler.items():
+            with self.subTest(kaynak=ad):
+                self.assertGreater(veri["count"], 100)
+                self.assertEqual(veri["count"], len(veri["agreements"]))
 
     def test_arama_alaninda_gorunmez_karakter_kalmaz(self):
         # Kayıt "id" alanı taşımıyor: dizideki sırasıyla birebir aynı olduğu için
         # gereksizdi ve kaldırıldı. Hangi kaydın kastedildiğini sıra söylüyor.
-        kirli = [i for i, r in enumerate(self.veri["agreements"], 1) if "\xa0" in r["search"]]
-        self.assertEqual(kirli, [], "arama alanında bölünmez boşluk kalmış (kayıt sırası)")
+        kirli = [(ad, i) for ad, veri in self.veriler.items()
+                 for i, r in enumerate(veri["agreements"], 1) if "\xa0" in r["search"]]
+        self.assertEqual(kirli, [], "arama alanında bölünmez boşluk kalmış (kaynak, kayıt sırası)")
 
     def test_arama_alani_katlanmis_durumda(self):
         # search alanı fold()'dan geçmiş olmalı: büyük harf ya da Türkçe
         # karakter kalmışsa bir yerde katlama atlanmış demektir.
-        for sira, r in enumerate(self.veri["agreements"][:50], 1):
-            with self.subTest(kayit=sira):
-                self.assertEqual(r["search"], bd.fold(r["search"]))
+        for ad, veri in self.veriler.items():
+            for sira, r in enumerate(veri["agreements"][:50], 1):
+                with self.subTest(kaynak=ad, kayit=sira):
+                    self.assertEqual(r["search"], bd.fold(r["search"]))
 
     def test_her_kaydin_zorunlu_alanlari_var(self):
-        for sira, r in enumerate(self.veri["agreements"][:50], 1):
-            with self.subTest(kayit=sira):
-                self.assertTrue(r["country"])
-                self.assertTrue(r["university"])
-                self.assertIn("search", r)
+        for ad, veri in self.veriler.items():
+            for sira, r in enumerate(veri["agreements"][:50], 1):
+                with self.subTest(kaynak=ad, kayit=sira):
+                    self.assertTrue(r["country"])
+                    self.assertTrue(r["university"])
+                    self.assertIn("search", r)
 
 
 class KaynakVerisiDurumu(unittest.TestCase):
@@ -392,7 +398,11 @@ class UlkeOnEki(unittest.TestCase):
     """
 
     def setUp(self):
-        self.kayitlar = kayitlar()
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            self.skipTest("data-*.json yok")
+        self.veriler = {yol.stem: json.loads(yol.read_text(encoding="utf-8"))["agreements"] for yol in dosyalar}
+        self.kayitlar = [r for recs in self.veriler.values() for r in recs]
 
     def test_hicbir_kayit_on_ekiyle_celismiyor(self):
         import importlib.util
@@ -402,11 +412,12 @@ class UlkeOnEki(unittest.TestCase):
         spec.loader.exec_module(bd)
 
         celisen = []
-        for r in self.kayitlar:
-            onekten = bd.ulke_onekten(r.get("erasmusCode", ""))
-            if onekten and bd.tr_upper(onekten) != r["country"]:
-                celisen.append(f"{r['university'][:34]}: {r['country']} "
-                               f"≠ {bd.tr_upper(onekten)} ({r['erasmusCode']})")
+        for ad, recs in self.veriler.items():
+            for r in recs:
+                onekten = bd.ulke_onekten(r.get("erasmusCode", ""))
+                if onekten and bd.tr_upper(onekten) != r["country"]:
+                    celisen.append(f"{ad} · {r['university'][:34]}: {r['country']} "
+                                   f"≠ {bd.tr_upper(onekten)} ({r['erasmusCode']})")
         self.assertEqual(celisen, [],
                          f"Yayınlanan veride ülke ile Erasmus kodu çelişiyor. "
                          f"Öğrenci yanlış ülke görüyor: {celisen}")
@@ -424,13 +435,15 @@ class UlkeOnEki(unittest.TestCase):
         bd = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(bd)
 
-        okunan = sum(1 for r in self.kayitlar
-                     if bd.ulke_onekten(r.get("erasmusCode", "")))
-        oran = okunan / len(self.kayitlar)
-        self.assertGreater(oran, 0.90,
-                           f"Erasmus kodu yalnız {okunan}/{len(self.kayitlar)} "
-                           f"kayıtta okunabiliyor (%{100*oran:.0f}). Kod biçimi "
-                           f"değişmiş olabilir; ülke denetimi boşa düşüyor.")
+        for ad, recs in self.veriler.items():
+            with self.subTest(kaynak=ad):
+                okunan = sum(1 for r in recs
+                             if bd.ulke_onekten(r.get("erasmusCode", "")))
+                oran = okunan / len(recs)
+                self.assertGreater(oran, 0.90,
+                                   f"{ad}: Erasmus kodu yalnız {okunan}/{len(recs)} "
+                                   f"kayıtta okunabiliyor (%{100*oran:.0f}). Kod biçimi "
+                                   f"değişmiş olabilir; ülke denetimi boşa düşüyor.")
 
 
 class BolumAdiYazimlari(unittest.TestCase):
@@ -575,7 +588,9 @@ class SutunAdlari(unittest.TestCase):
     """
 
     def test_kodda_numarayla_sutun_okuma_kalmamis(self):
-        kaynak = (ROOT / "scripts" / "build_data.py").read_text(encoding="utf-8")
+        dosyalar = [ROOT / "scripts" / "build_data.py", *sorted((ROOT / "scripts" / "parsers").glob("*.py"))]
+        self.assertGreater(len(dosyalar), 1, "scripts/parsers/ altında ayrıştırıcı modülü bulunamadı")
+        kaynak = "\n".join(p.read_text(encoding="utf-8") for p in dosyalar if p.exists())
         numarali = re.findall(r"col\(\s*\d+\s*\)", kaynak)
         self.assertEqual(numarali, [],
                          f"Sütun numarayla okunuyor: {numarali}. Ada göre "
@@ -625,16 +640,18 @@ class OnEkUlkeTutarliligi(unittest.TestCase):
 
     def test_her_kayit_kendi_on_ekiyle_uyumlu(self):
         import collections
-        veri = json.loads((ROOT / "site" / "data-maku.json").read_text(encoding="utf-8"))
-        kayitlar = veri["agreements"] if isinstance(veri, dict) else veri
-        self.assertGreater(len(kayitlar), 100, "Kayıt sayısı beklenenden az; kalıp bozulmuş olabilir.")
-
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        self.assertTrue(dosyalar, "data-*.json yok")
         esleme = collections.defaultdict(collections.Counter)
-        for a in kayitlar:
-            on = (a.get("erasmusCode") or "").strip()[:2].upper()
-            ulke = (a.get("country") or "").strip().upper()
-            if on and ulke:
-                esleme[on][ulke] += 1
+        for yol in dosyalar:
+            veri = json.loads(yol.read_text(encoding="utf-8"))
+            kayitlar = veri["agreements"] if isinstance(veri, dict) else veri
+            self.assertGreater(len(kayitlar), 100, f"{yol.name}: Kayıt sayısı beklenenden az; kalıp bozulmuş olabilir.")
+            for a in kayitlar:
+                on = (a.get("erasmusCode") or "").strip()[:2].upper()
+                ulke = (a.get("country") or "").strip().upper()
+                if on and ulke:
+                    esleme[on][ulke] += 1
 
         self.assertGreaterEqual(len(esleme), 5,
                                 f"Yalnız {len(esleme)} ön ek bulundu; alan adları değişmiş olabilir.")
@@ -778,19 +795,21 @@ class UretilenAlanAdlari(unittest.TestCase):
         `sourceDiff` eklenince ortaya çıktı · alan gerçekten üretiliyor ama
         ilk kayıtta yok.
         """
-        yol = ROOT / "site" / "data-maku.json"
-        if not yol.exists():
-            self.skipTest("data-maku.json yok")
-        kayitlar = json.loads(yol.read_text(encoding="utf-8"))["agreements"]
-        self.assertTrue(kayitlar, "Veride hiç kayıt yok")
-
-        eksik = [alan for alan in self.SITENIN_OKUDUGU
-                 if any(alan not in k for k in kayitlar)]
-        self.assertEqual(eksik, [],
-                         f"app.js okuyor ama bazı kayıtlarda yok: {eksik}")
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            self.skipTest("data-*.json yok")
+        tum_kayitlar = []
+        for yol in dosyalar:
+            kayitlar = json.loads(yol.read_text(encoding="utf-8"))["agreements"]
+            self.assertTrue(kayitlar, f"{yol.name}: Veride hiç kayıt yok")
+            eksik = [alan for alan in self.SITENIN_OKUDUGU
+                     if any(alan not in k for k in kayitlar)]
+            self.assertEqual(eksik, [],
+                             f"{yol.name}: app.js okuyor ama bazı kayıtlarda yok: {eksik}")
+            tum_kayitlar.extend(kayitlar)
 
         hic_yok = [alan for alan in self.KOSULLU_URETILEN
-                   if not any(alan in k for k in kayitlar)]
+                   if not any(alan in k for k in tum_kayitlar)]
         self.assertEqual(hic_yok, [],
                          f"Koşullu alan hiçbir kayıtta yok: {hic_yok}\n"
                          f"Üretici bu alanı yazmayı bırakmış olabilir; "
@@ -805,17 +824,18 @@ class UretilenAlanAdlari(unittest.TestCase):
                          f"{kullanilmayan}")
 
     def test_dolayli_kullanilan_alanlar_arama_metnine_giriyor(self):
-        yol = ROOT / "site" / "data-maku.json"
-        if not yol.exists():
-            self.skipTest("data-maku.json yok")
-        kayitlar = json.loads(yol.read_text(encoding="utf-8"))["agreements"]
-        for alan in self.DOLAYLI_KULLANILAN:
-            ornek = next((r for r in kayitlar if r.get(alan)), None)
-            if ornek is None:
-                self.skipTest(f"{alan} hiçbir kayıtta dolu değil")
-            with self.subTest(alan=alan):
-                self.assertIn(bd.fold(ornek[alan]), ornek["search"],
-                              f"{alan} arama metnine katılmıyor; kullanıcı onunla arama yapamaz")
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            self.skipTest("data-*.json yok")
+        for yol in dosyalar:
+            kayitlar = json.loads(yol.read_text(encoding="utf-8"))["agreements"]
+            for alan in self.DOLAYLI_KULLANILAN:
+                ornek = next((r for r in kayitlar if r.get(alan)), None)
+                if ornek is None:
+                    self.skipTest(f"{yol.name}: {alan} hiçbir kayıtta dolu değil")
+                with self.subTest(kaynak=yol.name, alan=alan):
+                    self.assertIn(bd.fold(ornek[alan]), ornek["search"],
+                                  f"{yol.name}: {alan} arama metnine katılmıyor; kullanıcı onunla arama yapamaz")
 
 
 class UniversiteKaydi(unittest.TestCase):
@@ -832,7 +852,7 @@ class UniversiteKaydi(unittest.TestCase):
     # Projeyle bir biçimde anılmış üniversite kısaltmaları. Belgede geçen ama
     # kayıtta olmayan bir ad, eskimiş bilgi demektir. Yeni üniversite eklenince
     # kısaltması buraya da yazılır.
-    BILINEN_KISALTMALAR = ["MAKÜ", "ISUBÜ", "İSUBÜ"]
+    BILINEN_KISALTMALAR = ["MAKÜ", "MÜ", "ESOGÜ", "BŞEÜ", "KKÜ", "ISUBÜ", "İSUBÜ"]
     BELGELER = ["README.md", "KAYNAK.md"]
 
     # Platformda olmayan bir üniversiteden söz etmek meşru olabilir (geçmiş kayıt,
@@ -885,11 +905,11 @@ class IscedKodlari(unittest.TestCase):
                          f"app.js'te olup build_data.py'da olmayan ISCED kodu: {eksik}")
 
     def test_uretilen_verideki_her_aile_sitede_karsilaniyor(self):
-        yol = ROOT / "site" / "data-maku.json"
-        if not yol.exists():
-            self.skipTest("data-maku.json yok")
-        veri = json.loads(yol.read_text(encoding="utf-8"))
-        veride = {f["code"] for f in veri["iscedFamilies"]}
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            self.skipTest("data-*.json yok")
+        veride = {f["code"] for yol in dosyalar
+                  for f in json.loads(yol.read_text(encoding="utf-8"))["iscedFamilies"]}
         js = js_anahtarlar("FAMILY_SHORT")
         eksik = veride - js
         self.assertEqual(eksik, set(),
@@ -958,6 +978,13 @@ class KaynakIzi(unittest.TestCase):
     hâlden ayrıldığımızı söylemeden doğru olmuyor.
     """
 
+    def tum_kayitlar(self):
+        dosyalar = sorted((ROOT / "site").glob("data-*.json"))
+        if not dosyalar:
+            self.skipTest("data-*.json yok")
+        return [r for yol in dosyalar
+                for r in json.loads(yol.read_text(encoding="utf-8"))["agreements"]]
+
     def test_kaynaktaki_deger_uretiliyorsa_gosteriliyor(self):
         """Üretici `kaynakta` yazıyorsa gösterim onu ekrana koymalı.
 
@@ -970,8 +997,7 @@ class KaynakIzi(unittest.TestCase):
         Vaat şu: kaynaktan ayrıldığımız yerde öğrenci **kaynaktaki hâli de**
         görebilmeli. Türü göstermek o vaadin yarısı.
         """
-        veri = json.loads((ROOT / "site" / "data-maku.json")
-                          .read_text(encoding="utf-8"))["agreements"]
+        veri = self.tum_kayitlar()
         js = (ROOT / "site" / "app.js").read_text(encoding="utf-8")
         bas = js.index("function sourceNote")
         son = js.index("\nfunction ", bas + 10)
@@ -1008,8 +1034,7 @@ class KaynakIzi(unittest.TestCase):
             f"biri değeri okuyup ekrana koymuyor.")
 
     def test_veride_iz_varsa_gosterimde_karsiligi_var(self):
-        veri = json.loads((ROOT / "site" / "data-maku.json")
-                          .read_text(encoding="utf-8"))["agreements"]
+        veri = self.tum_kayitlar()
         js = (ROOT / "site" / "app.js").read_text(encoding="utf-8")
 
         alanlar = set()
@@ -1129,7 +1154,9 @@ class KisiselVeri(unittest.TestCase):
         Yalnız çıktıya bakmak yetmez · alan okunup başka bir ada yazılırsa
         çıktı temiz görünürdü. Bu test kaynağı okuyor.
         """
-        kaynak = (ROOT / "scripts" / "build_data.py").read_text(encoding="utf-8")
+        dosyalar = [ROOT / "scripts" / "build_data.py", *sorted((ROOT / "scripts" / "parsers").glob("*.py"))]
+        self.assertGreater(len(dosyalar), 1, "scripts/parsers/ altında ayrıştırıcı modülü bulunamadı")
+        kaynak = "\n".join(p.read_text(encoding="utf-8") for p in dosyalar if p.exists())
         # Yalnız sütun haritası ve kayıt sözlüğü aranıyor; docstring'de
         # "okunmuyor" diye geçmesi meşru.
         satirlar = [s for s in kaynak.split("\n")
@@ -1138,10 +1165,6 @@ class KisiselVeri(unittest.TestCase):
             satirlar, [],
             "build_data.py kişisel sütunu geri okumaya başlamış:\n  "
             + "\n  ".join(s.strip() for s in satirlar))
-
-
-if __name__ == "__main__":
-    unittest.main()
 
 
 class MarmaraKontenjanDilbilgisi(unittest.TestCase):
@@ -1245,8 +1268,10 @@ class UcKaynakAyniSemayi_Uretiyor(unittest.TestCase):
 
     def test_en_az_uc_kaynak_var(self):
         """Alt sınır · bir veri dosyası üretilmezse üstteki testler boşa döner."""
-        n = len(list(self.veriler()))
-        self.assertGreaterEqual(n, 3, f"Yalnız {n} veri dosyası bulundu.")
+        uretilen = {ad for ad, _ in self.veriler()}
+        beklenen = {f"data-{u['id']}" for u in json.loads((ROOT / "config" / "universities.json").read_text(encoding="utf-8"))}
+        self.assertGreaterEqual(len(uretilen), 3, f"Yalnız {len(uretilen)} veri dosyası bulundu.")
+        self.assertEqual(uretilen, beklenen, f"Kayıtlı kurumlar ile üretilen data-*.json dosyaları uyuşmuyor: {uretilen} != {beklenen}")
 
 
 class EsoguFakulteSiniri(unittest.TestCase):
@@ -1338,7 +1363,7 @@ class SuresiDolmusAnlasmalar(unittest.TestCase):
     """
 
     # Ölçüldü 24 Ağustos 2026 · kaynak listeler o gün indirildi.
-    BEKLENEN = {"data-maku": 3, "data-marmara": 0, "data-esogu": 0}
+    BEKLENEN = {"data-maku": 3, "data-marmara": 0, "data-esogu": 0, "data-bilecik": 5, "data-kku": 0}
 
     @staticmethod
     def bitis_yili(ham):
@@ -1364,6 +1389,9 @@ class SuresiDolmusAnlasmalar(unittest.TestCase):
         return n
 
     def test_dolmus_sayisi_beklenenle_ayni(self):
+        mevcut = {p.stem for p in sorted((ROOT / "site").glob("data-*.json"))}
+        self.assertEqual(set(self.BEKLENEN), mevcut,
+                         f"BEKLENEN listesi tüm data-*.json dosyalarını kapsamıyor: {mevcut ^ set(self.BEKLENEN)}")
         fark = {ad: (bek, self.say(ad)) for ad, bek in self.BEKLENEN.items()
                 if self.say(ad) != bek}
         self.assertEqual(fark, {},
@@ -1399,7 +1427,7 @@ class AyniPartnerAyniBolumIkiKez(unittest.TestCase):
     Test sayıyı pimliyor: Artarsa kaynağa yeni bir çift girmiş demek.
     """
 
-    BEKLENEN = {"data-maku": 19, "data-marmara": 6, "data-esogu": 2}
+    BEKLENEN = {"data-maku": 19, "data-marmara": 6, "data-esogu": 2, "data-bilecik": 5, "data-kku": 2}
 
     def say(self, ad):
         d = json.loads((ROOT / "site" / f"{ad}.json").read_text(encoding="utf-8"))["agreements"]
@@ -1407,9 +1435,16 @@ class AyniPartnerAyniBolumIkiKez(unittest.TestCase):
         return sum(1 for v in c.values() if v > 1)
 
     def test_yinelenen_cift_sayisi_beklenenle_ayni(self):
+        mevcut = {p.stem for p in sorted((ROOT / "site").glob("data-*.json"))}
+        self.assertEqual(set(self.BEKLENEN), mevcut,
+                         f"BEKLENEN listesi tüm data-*.json dosyalarını kapsamıyor: {mevcut ^ set(self.BEKLENEN)}")
         fark = {ad: (bek, self.say(ad)) for ad, bek in self.BEKLENEN.items()
                 if self.say(ad) != bek}
         self.assertEqual(fark, {},
                          f"Aynı partner+bölüm çifti sayısı değişti (beklenen, bulunan): {fark}\n"
                          f"Kaynağa yeni bir çift girmiş olabilir · bakıp buradaki sayıyı "
                          f"güncelleyin.")
+
+
+if __name__ == "__main__":
+    unittest.main()

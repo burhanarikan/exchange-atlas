@@ -13,7 +13,7 @@ anlaşma listelerini öğrencinin arayabileceği bir listeye çeviriyor. Veriyi 
 Bu, bir sorumluluk doğuruyor: Okurken bazı kararlar vermek zorunda kalıyoruz ve o
 kararlar öğrencinin gördüğü şeyi değiştiriyor. **Hepsi burada yazılı.**
 
-Şu an platformda **dört kurum** var. Kaynakların indirme tarihleri kurum bazında
+Şu an platformda **beş kurum** var. Kaynakların indirme tarihleri kurum bazında
 değişiyor ve her biri [`site/kaynak-kunyesi.json`](site/kaynak-kunyesi.json)'da
 yazılı. Listenizi ilgili tarihten sonra güncellediyseniz sayılar değişmiş olabilir.
 
@@ -23,6 +23,7 @@ yazılı. Listenizi ilgili tarihten sonra güncellediyseniz sayılar değişmiş
 | Marmara Üniversitesi | 790 | 27 sayfa, fakülte başına bir sayfa |
 | Eskişehir Osmangazi Üniversitesi | 259 | Tek sayfa, fakülte blokları hâlinde |
 | Bilecik Şeyh Edebali Üniversitesi | 207 bölüm/alan satırı | İlk sayfa, birleştirilmiş anlaşma ve bölüm hücreleri |
+| Kırıkkale Üniversitesi | 165 | Tek sayfa (`KA131_web`), 21 sütun |
 
 **Listeler birbirinden farklı** ve bu beklenen bir şey · her kurum kendi
 tablosunu kendi ihtiyacına göre kuruyor. Aşağıdaki bölümler ayrımları
@@ -521,3 +522,16 @@ ve 207 bölüm/alan satırı vardır. Sitedeki 207 bölüm/alan kaydı bu satır
   kaynak metni gösterilir ve aranabilir; bu satırlar alan filtresinde görünmez.
 - Kaynağın iletişim sütunu okunmaz. Diğer sayfalar anlaşma tablosu olmadığı
   için bu listeye katılmaz.
+
+Kırıkkale Üniversitesi'nin [resmî Erasmus+ belgeler sayfasındaki](https://abofisi.kku.edu.tr/Idari/Sayfa/Index?Sayfa=Erasmusplusbelgeler)
+güncel KA131 ikili anlaşma tablosu (`KA131_web` sayfası, 165 anlaşma satırı) okunur:
+
+- Akademik birim ve bölüm ayrı sütunlarda yazılıdır; her kartta bölüm adıyla birlikte
+  akademik birim de gösterilir, böylece `Tüm bölümler` yazan anlaşmaların hangi
+  fakülteye ait olduğu doğrudan görülür.
+- Öğrenim kontenjanı ön lisans, lisans, yüksek lisans ve doktora sayı sütunlarından
+  (`ÖL`, `L`, `YL`, `D`), personel ders verme kontenjanı ise `STA (Personel)` sayı
+  sütunundan okunur.
+- Tabloda ISCED alan kodu, geçerlilik aralığı ve dil şartı sütunu bulunmadığı için
+  bu alanlar tahmin edilmez ve boş bırakılır. Tablodaki 165 satırın tamamında ülke
+  sütunu Erasmus kurum kodunun ön ekiyle birebir uyuşmaktadır.

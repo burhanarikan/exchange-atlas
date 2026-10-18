@@ -252,6 +252,20 @@ class UniversiteEklemeOnKosulu(unittest.TestCase):
             f"Çözülmeden ikinci üniversite eklenmemeliydi; ya kullanıcıya bildirin "
             f"ya da üniversite seçimine yönlendirin.")
 
+    def test_rehberde_coklu_rehber_varken_sessiz_ilk_rehbere_dusus_yok(self):
+        yol = ROOT / "site" / "universities.json"
+        if not yol.exists():
+            self.skipTest("universities.json yok")
+        rehberli = [u for u in json.loads(yol.read_text(encoding="utf-8")) if u.get("hasGuide")]
+        if len(rehberli) <= 1:
+            return
+        kaynak = (ROOT / "site" / "guide.js").read_text(encoding="utf-8")
+        sessiz = re.search(r"unis\.find\([^)]*hasGuide[^)]*\)\s*\|\|\s*unis\[0\]", kaynak)
+        self.assertIsNone(
+            sessiz,
+            f"Platformda {len(rehberli)} rehber var ama ?uni= verilmediğinde guide.js "
+            f"sessizce ilk rehbere düşüyor; üniversite seçimine yönlendirmeli.")
+
 
 def _srgb(c):
     c = c / 255

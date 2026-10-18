@@ -163,9 +163,10 @@
   atlasJson("universities.json")
     .then(function (unis) {
       UNIS = unis;
+      var rehberliler = unis.filter(function (u) { return u.hasGuide; });
       UNI = UNI_ID
         ? unis.find(function (u) { return u.id === UNI_ID; })
-        : (unis.find(function (u) { return u.hasGuide; }) || unis[0]);
+        : (rehberliler.length === 1 ? rehberliler[0] : (unis.length === 1 ? unis[0] : null));
       if (UNI) kanonikBildir(UNI.id);
       apply();
     })

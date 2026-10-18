@@ -8,6 +8,10 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+- Kırıkkale Üniversitesi (`kku`) 165 bölüm/alan kaydıyla 5. kurum olarak eklendi; birleştirilmiş hücreli fakülte/bölüm yapısı, düzey bayrakları ve kişi × gün/ay kontenjan gösterimi korunuyor.
+- Marmara, ESOGÜ, Bilecik Şeyh Edebali ve Kırıkkale üniversiteleri için çift dilli (`TR`/`EN`) başvuru rehberleri eklendi; 5 kurumun tamamında `hasGuide: true` etkinleştirildi ve `?uni=` parametresi olmadığında sessizce ilk rehbere düşmek yerine kurum seçimi gösteriliyor.
+- Kurum ayrıştırıcıları `scripts/parsers/` paketine modüler olarak ayrıldı; anlaşma kartları üstüne öğrenim düzeyi ve kontenjan okuma ipucu eklendi.
+- Haftalık ve elle tetiklenebilen salt-okunur kaynak tazelik denetimi (`.github/workflows/source-check.yml`) eklendi.
 - Canlı kontrolde eski tarayıcı önbelleğinin yeni veriyi eski kodla gösterdiği görüldü; JS/CSS bağlantıları içerik özetiyle sürümleniyor, JSON yeniden doğrulanıyor. Canlı başlık denetimine önbellek ve NEL raporlama politikası eklendi.
 - Kaynak kontrol tarihi veri üretim tarihinden ayrıldı; 30 günü aşan kaynaklarda yeniden kontrol uyarısı gösteriliyor.
 - Dört kurumun resmî Excel dosyaları otomatik indirilebiliyor. Yenilemeye kurum seçimi, önizleme ve JSON fark raporu eklendi; başarısız indirme eski veriyi değiştirmiyor.

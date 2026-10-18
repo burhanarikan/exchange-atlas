@@ -67,6 +67,21 @@
       "son_kontrol_tarihi": "2026-09-20",
       "indirme_tarihi": "2026-09-20",
       "adres_notu": "Dosya adresi değişebilir; resmî liste sayfasındaki tek Excel bağlantısı yeniden bulunur."
+    },
+    {
+      "id": "kku",
+      "kurum": "Kırıkkale Üniversitesi",
+      "birim": "KKÜ Dış İlişkiler ve AB Koordinatörlüğü",
+      "liste_sayfasi": "https://abofisi.kku.edu.tr/Idari/Sayfa/Index?Sayfa=Erasmusplusbelgeler",
+      "dosya_adresi": "https://panel.kku.edu.tr/Content/abofisi/erasmusbelgeler/anlasmalar/Erasmus%20%C4%B0kili%20Anla%C5%9Fmalar.xlsx",
+      "yerel_ad": "lokal/kku/kku-ka131-ikili-anlasmalar.xlsx",
+      "yapi_notu": "Tek sayfa (KA131_web). İki başlık satırı (1. satır grup başlıkları, 2. satır sütun başlıkları), 3. satırdan itibaren 165 anlaşma. Akademik birim, bölüm, partner üniversite, Erasmus kodu, ülke, şehir, dört öğrenim kademesi kontenjanı ve personel ders verme (STA) kontenjanı ayrı sütunlarda yazılı.",
+      "sha256": "a3ad518bc121230af1f2097e2e8554e015daa2a4963ec3951c797bad068c2c9a",
+      "boyut_bayt": 33470,
+      "kayit_sayisi": 165,
+      "son_kontrol_tarihi": "2026-10-18",
+      "indirme_tarihi": "2026-10-18",
+      "adres_notu": "Dosya adresi değişebilir; resmî liste sayfasındaki tek Excel bağlantısı yeniden bulunur."
     }
   ],
   "yeniden_uretim": [

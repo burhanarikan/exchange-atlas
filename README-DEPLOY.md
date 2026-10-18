@@ -36,7 +36,7 @@ Canlı response header doğrulaması için repository variable olarak şu adres 
 gh variable set LIVE_SITE_URL --body https://exchangeatlas.org -R burhanarikan/exchange-atlas
 ```
 
-`LIVE_SITE_URL` tanımlandığında workflow ana route'ları, dört üniversite listesini ve MAKÜ rehberini gerçek HTTP yanıtları üzerinden kontrol eder. Cloudflare Pages `_headers` dosyasını parse ederek güvenlik başlıklarını canlı yanıta ekler; başlıklar görünmüyorsa yayın güvenli kabul edilmez.
+`LIVE_SITE_URL` tanımlandığında workflow ana route'ları, beş üniversite listesini ve MAKÜ rehberini gerçek HTTP yanıtları üzerinden kontrol eder. Cloudflare Pages `_headers` dosyasını parse ederek güvenlik başlıklarını canlı yanıta ekler; başlıklar görünmüyorsa yayın güvenli kabul edilmez.
 
 ## 3. Gerçek HTTP response header'ları
 
@@ -93,6 +93,7 @@ for url in \
   'https://exchangeatlas.org/agreements.html?uni=marmara' \
   'https://exchangeatlas.org/agreements.html?uni=esogu' \
   'https://exchangeatlas.org/agreements?uni=bilecik' \
+  'https://exchangeatlas.org/agreements?uni=kku' \
   'https://exchangeatlas.org/guide?uni=maku'; do
   echo "--- $url"
   curl -sS -D - -o /dev/null "$url" | grep -Ei '^(HTTP/|content-security-policy:|x-frame-options:|x-content-type-options:|referrer-policy:|permissions-policy:|strict-transport-security:)'
@@ -112,7 +113,7 @@ grep -RInE 'http://|//[^/]' site --exclude='*.json'
 grep -RInE 'https?://|fetch\(|XMLHttpRequest|WebSocket|EventSource|sendBeacon|import\(' site --exclude='*.json'
 ```
 
-Resmî üniversite bağlantıları kullanıcı tıklamasıyla açılan dış bağlantılar olabilir; sayfa açılışında otomatik dış istek olmamalıdır. Tarayıcı geliştirici araçlarında Network paneli açıkken ana sayfa, dört anlaşma sayfası ve MAKÜ rehberi yenilenir; üçüncü taraf otomatik istek veya mixed-content uyarısı bulunmamalıdır.
+Resmî üniversite bağlantıları kullanıcı tıklamasıyla açılan dış bağlantılar olabilir; sayfa açılışında otomatik dış istek olmamalıdır. Tarayıcı geliştirici araçlarında Network paneli açıkken ana sayfa, beş anlaşma sayfası ve MAKÜ rehberi yenilenir; üçüncü taraf otomatik istek veya mixed-content uyarısı bulunmamalıdır.
 
 ### 6.1 Yayın ortamının kendi enjeksiyonu
 
@@ -176,10 +177,10 @@ yeniden doğrulama ile raporlamanın kapalı olduğunu kontrol eder; ana dal CI'
 
 Yayınlanan adres üzerinde masaüstü ve mobil görünümde şu akışlar tamamlanır:
 
-- Ana sayfada dört üniversite kartı, anlaşma sayısı ve kaynak kontrol tarihi görünür.
-- MAKÜ, Marmara, ESOGÜ ve Bilecik listeleri doğru `uni` parametresiyle açılır.
+- Ana sayfada beş üniversite kartı, anlaşma sayısı ve kaynak kontrol tarihi görünür.
+- MAKÜ, Marmara, ESOGÜ, Bilecik ve KKÜ listeleri doğru `uni` parametresiyle açılır.
 - Bölüm/üniversite/ülke araması, ülke filtresi, derece filtresi, kontenjan filtresi, temizleme ve “daha fazla göster” çalışır.
-- Alan kodu olmayan Marmara ve ESOGÜ listelerinde boş filtre yerine açıklayıcı metin görünür.
+- Alan kodu olmayan Marmara, ESOGÜ ve KKÜ listelerinde boş filtre yerine açıklayıcı metin görünür.
 - Sonuç bulunamadığında boş durum mesajı ve aktif filtreleri temizleme yolu anlaşılır.
 - TR/EN geçişi; başlık, arama placeholder'ı, filtreler, kartlar, kaynak uyarısı ve footer'da tutarlı kalır.
 - Kaynak üniversite bağlantısı, karttaki partner bağlantısı ve geri bildirim e-postası doğru hedefe gider.

@@ -1,0 +1,44 @@
+name: Scheduled source freshness check
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source_check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: resmî kaynakları salt-okunur denetle
+        run: |
+          python3 scripts/build_data.py --pull --dry-run --report /tmp/atlas-kaynak-raporu.json
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          rapor = json.loads(Path("/tmp/atlas-kaynak-raporu.json").read_text(encoding="utf-8"))
+          print("## Kaynak Kontrol Raporu (Salt-Okunur Önizleme)")
+          print("")
+          print(f"- **Kontrol zamanı:** `{rapor['checkedAt']}`")
+          print(f"- **Önizleme (`dryRun`):** `{rapor['dryRun']}`")
+          print("")
+          print("| Kurum | Önceki Kayıt | Güncel Kayıt | Eklenen | Çıkarılan | Kaynak Durumu |")
+          print("|---|---:|---:|---:|---:|---|")
+          for u in rapor["universities"]:
+              durum = "Değişti" if u["sourceChanged"] else "Aynı"
+              print(f"| `{u['id']}` | {u['previousCount']} | {u['count']} | +{u['added']} | -{u['removed']} | {durum} |")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: atlas-kaynak-raporu
+          path: /tmp/atlas-kaynak-raporu.json
+          if-no-files-found: ignore
