@@ -169,6 +169,7 @@ kontrolleri için Node.js gerekir. Testler ağ kullanmaz. Dosyalar işlerine gö
 `config/universities.json` içine kurum kaydı ve o üniversitenin Excel biçimi
 için bir ayrıştırıcı işlev eklenir. Giriş sayfası kartı, kaynak künyesi ve sitemap
 kendiliğinden üretilir. Adımlar ve Bilecik pilotu: [`VERI-BAKIMI.md`](VERI-BAKIMI.md).
+Projenin başka bir kişiye, topluluğa veya kuruma devri için: [`DEVIR.md`](DEVIR.md).
 
 Veri güncelleme tek komut ve **bakımcının makinesinde** çalışır, sunucuda
 değil:
