@@ -8,6 +8,9 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+## [1.1.0] - 2026-10-22
+
+- GitHub Actions adımları Node 24 üzerinde çalışan güncel major sürümlere yükseltildi; Node 20 desteği kaldırıldığında CI, canlı denetim ve haftalık kaynak denetiminin durması önlendi.
 - 22 Ekim 2026 kaynak kontrolü: Marmara 790'dan 795 kayda çıktı (7 yeni, 2 kaldırılan, 52 güncellenen kayıt), Bilecik 207'den 226 bölüm/alan satırına çıktı (19 yeni satır, 6 satırda uzatılan geçerlilik). MAKÜ, ESOGÜ ve Kırıkkale dosyaları değişmedi; beş kurumun kaynak kontrol tarihi ilerletildi. İngilizce görünüm için İzlanda ülke karşılığı eklendi.
 - Kırıkkale Üniversitesi (`kku`) 165 bölüm/alan kaydıyla 5. kurum olarak eklendi; birleştirilmiş hücreli fakülte/bölüm yapısı, düzey bayrakları ve kişi × gün/ay kontenjan gösterimi korunuyor.
 - Marmara, ESOGÜ, Bilecik Şeyh Edebali ve Kırıkkale üniversiteleri için çift dilli (`TR`/`EN`) başvuru rehberleri eklendi; 5 kurumun tamamında `hasGuide: true` etkinleştirildi ve `?uni=` parametresi olmadığında sessizce ilk rehbere düşmek yerine kurum seçimi gösteriliyor.
@@ -45,5 +48,6 @@ Henüz yayımlanmamış değişiklikler burada tutulur.
 - Sosyal önizleme kartı, güncel canlı arayüzü ve Marmara Üniversitesi’nin `MÜ` kısa adını yansıtacak şekilde yenilendi.
 - LinkedIn’in eski kart cache’ini aşmak için normal route’ları etkilemeyen noindex paylaşım alias’ı eklendi.
 
-[Unreleased]: https://github.com/burhanarikan/exchange-atlas/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/burhanarikan/exchange-atlas/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/burhanarikan/exchange-atlas/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/burhanarikan/exchange-atlas/releases/tag/v1.0.0
