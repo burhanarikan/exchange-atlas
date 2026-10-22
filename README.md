@@ -10,7 +10,7 @@ Depo public ve katkıya açık. Kanonik yayın Cloudflare Pages üzerinde; yayı
 ve geri dönüş prosedürü [`README-DEPLOY.md`](README-DEPLOY.md)'de yazılıdır.
 
 [![Live site](https://img.shields.io/website?url=https%3A%2F%2Fexchangeatlas.org&label=live%20site)](https://exchangeatlas.org)
-[![Quality checks](https://github.com/burhanarikan/exchange-atlas/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/burhanarikan/exchange-atlas/actions/workflows/pages.yml)
+[![Quality checks](https://github.com/nurarikan/exchange-atlas/actions/workflows/pages.yml/badge.svg?branch=main)](https://github.com/nurarikan/exchange-atlas/actions/workflows/pages.yml)
 [![License: MIT](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
 
 **Hızlı bağlantılar:** [Canlı site](https://exchangeatlas.org) · [Katkı rehberi](CONTRIBUTING.md) · [Güvenlik bildirimi](SECURITY.md) · [Davranış kuralları](CODE_OF_CONDUCT.md) · [Değişiklik günlüğü](CHANGELOG.md) · [Atıf](CITATION.cff)
@@ -198,7 +198,7 @@ Açık kaynak · kod [MIT](LICENSE), veri ve içerik ayrı koşullarda
   başka bir şey mi var (anlaşma takibi, süre bitimi, nominasyon takvimleri,
   raporlama…)? Anlatın · çözülebilir olanları yol haritasına alalım, birlikte
   tasarlayalım. Bu proje de böyle bir dertten doğdu.
-- **Hata / öneri:** issue açın ya da yazın: burhanarikan@yaani.com
+- **Hata / öneri:** issue açın ya da yazın: nurarikan.contact@gmail.com
 - **Yeni üniversite:** üniversitenizin kamuya açık ikili anlaşma listesinin
   linkiyle issue açın, parser'ı birlikte ekleyelim (ya da PR gönderin).
 - **PR akışı:** `feat/`, `fix/` önekli branch + kısa açıklama yeterli.
@@ -210,7 +210,7 @@ Açık kaynak · kod [MIT](LICENSE), veri ve içerik ayrı koşullarda
   ve belgeler) kaynak atfıyla derlenir. Resmî başvuru için üniversitenizin
   Erasmus+ koordinatörlüğüne, uluslararası ilişkiler birimine veya diğer ilgili birime danışın.
 - Bir üniversite kendi verisiyle ilgili düzeltme ya da kaldırma talep ederse
-  tartışmasız yerine getirilir. Talepler: burhanarikan@yaani.com
+  tartışmasız yerine getirilir. Talepler: nurarikan.contact@gmail.com
 
 ## Lisans
 

@@ -8,6 +8,7 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+- Proje Havva Nur Arıkan'a devredildi: depo adresi `nurarikan/exchange-atlas`, iletişim ve kaldırma talebi adresi, telif ve atıf bilgileri güncellendi.
 - Haftalık kaynak denetimi artık bakımcıya haber veriyor: Kaynak değiştiğinde, kontrol tarihi sitedeki 30 günlük uyarıya bir hafta kaldığında ya da denetim başarısız olduğunda tek bir `kaynak-denetimi` issue'su açılıyor; her şey yolundaysa kendiliğinden kapanıyor.
 
 ## [1.1.0] - 2026-10-22
@@ -50,6 +51,6 @@ Henüz yayımlanmamış değişiklikler burada tutulur.
 - Sosyal önizleme kartı, güncel canlı arayüzü ve Marmara Üniversitesi’nin `MÜ` kısa adını yansıtacak şekilde yenilendi.
 - LinkedIn’in eski kart cache’ini aşmak için normal route’ları etkilemeyen noindex paylaşım alias’ı eklendi.
 
-[Unreleased]: https://github.com/burhanarikan/exchange-atlas/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/burhanarikan/exchange-atlas/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/burhanarikan/exchange-atlas/releases/tag/v1.0.0
+[Unreleased]: https://github.com/nurarikan/exchange-atlas/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/nurarikan/exchange-atlas/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/nurarikan/exchange-atlas/releases/tag/v1.0.0
