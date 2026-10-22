@@ -14,7 +14,7 @@ const COUNTRY = {
   "FİNLANDİYA": { en: "Finland", flag: "🇫🇮" }, "BELÇİKA": { en: "Belgium", flag: "🇧🇪" }, "AVUSTURYA": { en: "Austria", flag: "🇦🇹" },
   "FRANSA": { en: "France", flag: "🇫🇷" }, "HIRVATİSTAN": { en: "Croatia", flag: "🇭🇷" },
   "HOLLANDA": { en: "Netherlands", flag: "🇳🇱" }, "KUZEY MAKEDONYA": { en: "North Macedonia", flag: "🇲🇰" },
-  "LETONYA": { en: "Latvia", flag: "🇱🇻" }, "LİTVANYA": { en: "Lithuania", flag: "🇱🇹" },
+  "İZLANDA": { en: "Iceland", flag: "🇮🇸" }, "LETONYA": { en: "Latvia", flag: "🇱🇻" }, "LİTVANYA": { en: "Lithuania", flag: "🇱🇹" },
   "LÜKSEMBURG": { en: "Luxembourg", flag: "🇱🇺" },
   "MACARİSTAN": { en: "Hungary", flag: "🇭🇺" }, "MALTA": { en: "Malta", flag: "🇲🇹" },
   "POLONYA": { en: "Poland", flag: "🇵🇱" }, "PORTEKİZ": { en: "Portugal", flag: "🇵🇹" },

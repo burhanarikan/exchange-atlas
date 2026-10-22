@@ -120,9 +120,9 @@ sonraki kaynak yenilemesiyle kendiliğinden yeniden eklenmemelidir.
 
 ## Bilecik pilotunun sınırları
 
-Resmî dosyanın ilk sayfasında 79 anlaşma grubu, 79 farklı partner adı
-ve 207 yayımlanan bölüm/alan satırı bulunur. Sitedeki 207 sayısı satır sayısıdır;
-207 ayrı partner veya bağımsız kontenjan anlamına gelmez.
+Resmî dosyanın ilk sayfasında 83 anlaşma grubu, 83 farklı partner adı
+ve 226 yayımlanan bölüm/alan satırı bulunur. Sitedeki 226 sayısı satır sayısıdır;
+226 ayrı partner veya bağımsız kontenjan anlamına gelmez.
 
 Birleştirilmiş kontenjan hücresi birden fazla satırda görünür ve kartta ortak
 olduğu belirtilir. Öğrenci kontenjanı kişi × ay, personel kontenjanı kişi × gün

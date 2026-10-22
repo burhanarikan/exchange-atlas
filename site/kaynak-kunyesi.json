@@ -21,7 +21,7 @@
           "gerekce": "Kaynak Excel'de satır üstü çizili ve kurum tarafından silindiği belirtilmiş."
         }
       ],
-      "son_kontrol_tarihi": "2026-09-20"
+      "son_kontrol_tarihi": "2026-10-22"
     },
     {
       "id": "marmara",
@@ -32,12 +32,12 @@
       "adres_notu": "Paylaşım arşivindeki tek Excel otomatik alınır; birden çok Excel varsa işlem durur.",
       "yerel_ad": "lokal/marmara/marmara-ka131-ikili-anlasmalar.xlsx",
       "yapi_notu": "27 sayfa, fakülte başına bir sayfa. Her sayfanın ALTINDA ayrı bir tablo var: 'Zorunlu Dil ID' sözlüğü. Yabancı dil sütunu sayı taşıyor (1, 1;19) ve o sözlük olmadan okunamıyor · 66 giriş, 27 sayfada da tutarlı.",
-      "sha256": "7f206afb7c0891c7fe8a01da2a91f65a132b7f0d356b3b0118e6ec00c5268826",
-      "boyut_bayt": 195375,
-      "indirme_tarihi": "2026-09-20",
-      "kayit_sayisi": 790,
-      "son_kontrol_tarihi": "2026-09-20",
-      "arsiv_uyesi": "Güncel Erasmus İkili Anlaşmalar Listesi/Erasmus KA131 İkili Anlaşma Listesi 14.09.2026.xlsx"
+      "sha256": "e500ec51d255708b727de36286d41c187abcb1ddb3895f18ecce1a0ebba98fc1",
+      "boyut_bayt": 203943,
+      "indirme_tarihi": "2026-10-22",
+      "kayit_sayisi": 795,
+      "son_kontrol_tarihi": "2026-10-22",
+      "arsiv_uyesi": "Güncel Erasmus İkili Anlaşmalar Listesi/Erasmus KA131 İkili Anlaşma Listesi 21.10.2026.xlsx"
     },
     {
       "id": "esogu",
@@ -52,20 +52,20 @@
       "boyut_bayt": 40791,
       "indirme_tarihi": "2026-08-23",
       "kayit_sayisi": 259,
-      "son_kontrol_tarihi": "2026-09-20"
+      "son_kontrol_tarihi": "2026-10-22"
     },
     {
       "id": "bilecik",
       "kurum": "Bilecik Şeyh Edebali Üniversitesi",
       "birim": "BŞEÜ Uluslararası İlişkiler Ofisi Koordinatörlüğü",
       "liste_sayfasi": "https://bilecik.edu.tr/uluslararasi/Icerik/Anla%C5%9Fmalar_95fd9",
-      "dosya_adresi": "https://www.bilecik.edu.tr/dosya/7407_5868_%C4%B0K%C4%B0L%C4%B0%20ANLA%C5%9EMALAR%2021-27.xlsx",
+      "dosya_adresi": "https://www.bilecik.edu.tr/dosya/42/7407/7407_9f20_%C4%B0K%C4%B0L%C4%B0%20ANLA%C5%9EMALAR%2021-27.xlsx",
       "yerel_ad": "lokal/bilecik/bilecik-ikili-anlasmalar.xlsx",
-      "sha256": "fc36296e55f625c9da96d519c14d5b21b4041a3b9a137b5677f3de591a8f6b34",
-      "boyut_bayt": 58693,
-      "kayit_sayisi": 207,
-      "son_kontrol_tarihi": "2026-09-20",
-      "indirme_tarihi": "2026-09-20",
+      "sha256": "707b2f1e3c64ed008990d48ecf6841229eaa3c55142534d47f1629c10e49f2a3",
+      "boyut_bayt": 61596,
+      "kayit_sayisi": 226,
+      "son_kontrol_tarihi": "2026-10-22",
+      "indirme_tarihi": "2026-10-22",
       "adres_notu": "Dosya adresi değişebilir; resmî liste sayfasındaki tek Excel bağlantısı yeniden bulunur."
     },
     {
@@ -79,7 +79,7 @@
       "sha256": "a3ad518bc121230af1f2097e2e8554e015daa2a4963ec3951c797bad068c2c9a",
       "boyut_bayt": 33470,
       "kayit_sayisi": 165,
-      "son_kontrol_tarihi": "2026-10-18",
+      "son_kontrol_tarihi": "2026-10-22",
       "indirme_tarihi": "2026-10-18",
       "adres_notu": "Dosya adresi değişebilir; resmî liste sayfasındaki tek Excel bağlantısı yeniden bulunur."
     }

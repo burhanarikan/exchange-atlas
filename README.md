@@ -20,9 +20,9 @@ ve geri dönüş prosedürü [`README-DEPLOY.md`](README-DEPLOY.md)'de yazılıd
 | Üniversite | Anlaşma | Kaynak |
 |---|---|---|
 | MAKÜ · Burdur Mehmet Akif Ersoy Üniversitesi | 468 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
-| MÜ · Marmara Üniversitesi | 790 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
+| MÜ · Marmara Üniversitesi | 795 | Uluslararası İlişkiler Koordinatörlüğü'nün kamuya açık KA131 listesi |
 | ESOGÜ · Eskişehir Osmangazi Üniversitesi | 259 | Uluslararası İlişkiler Birimi'nin kamuya açık ikili anlaşma listesi |
-| BŞEÜ · Bilecik Şeyh Edebali Üniversitesi | 207 | Uluslararası İlişkiler Ofisi Koordinatörlüğü'nün kamuya açık anlaşma listesi |
+| BŞEÜ · Bilecik Şeyh Edebali Üniversitesi | 226 | Uluslararası İlişkiler Ofisi Koordinatörlüğü'nün kamuya açık anlaşma listesi |
 | KKÜ · Kırıkkale Üniversitesi | 165 | Dış İlişkiler ve AB Koordinatörlüğü'nün kamuya açık KA131 listesi |
 
 Kaynak çekim tarihleri kurum bazında değişir; her dosyanın tarihi, özeti ve yapısı
