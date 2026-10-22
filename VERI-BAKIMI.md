@@ -84,6 +84,14 @@ kontrol iş akışı ([`.github/workflows/source-check.yml`](.github/workflows/s
 aynı sınırı korur: `contents: read` izniyle yalnız `--pull --dry-run --report`
 çalıştırır, kontrol raporunu üretir ve hiçbir kaynak/site dosyasını otomatik
 değiştirmez; değişiklikler incelenir ve yayın ayrı adımda yapılır.
+
+Bakımcıya haber vermek için tek yazma izni `issues: write`'tır
+([`scripts/source_check_issue.py`](scripts/source_check_issue.py)). Bir kaynak
+değiştiyse, kontrol tarihi 23 günü geçtiyse (sitedeki 30 günlük uyarıdan en az
+bir hafta önce) ya da denetim raporu üretilemediyse `kaynak-denetimi` etiketli
+tek bir issue açılır. Sonraki haftalarda aynı issue güncellenir ve yorumla
+yeniden bildirilir. Yenilemeden sonraki ilk denetimde her şey yolundaysa issue
+kendiliğinden kapanır.
 Siteye sunucu uygulaması, gizli anahtar, analitik veya çalışma anında dış
 istek eklenmez. Ham kaynak dosyaları ve kişisel iletişim sütunları yayımlanmaz.
 
