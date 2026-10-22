@@ -20,9 +20,9 @@ yazılı. Listenizi ilgili tarihten sonra güncellediyseniz sayılar değişmiş
 | Kurum | Yayımlanan kayıt | Listenin biçimi |
 |---|---|---|
 | Burdur Mehmet Akif Ersoy Üniversitesi | 468 | Tek sayfa, 19 sütun |
-| Marmara Üniversitesi | 790 | 27 sayfa, fakülte başına bir sayfa |
+| Marmara Üniversitesi | 795 | 27 sayfa, fakülte başına bir sayfa |
 | Eskişehir Osmangazi Üniversitesi | 259 | Tek sayfa, fakülte blokları hâlinde |
-| Bilecik Şeyh Edebali Üniversitesi | 207 bölüm/alan satırı | İlk sayfa, birleştirilmiş anlaşma ve bölüm hücreleri |
+| Bilecik Şeyh Edebali Üniversitesi | 226 bölüm/alan satırı | İlk sayfa, birleştirilmiş anlaşma ve bölüm hücreleri |
 | Kırıkkale Üniversitesi | 165 | Tek sayfa (`KA131_web`), 21 sütun |
 
 **Listeler birbirinden farklı** ve bu beklenen bir şey · her kurum kendi
@@ -497,12 +497,18 @@ Kararlarımızın hepsi bu belgede ve **başka bir yere bakmak gerekmiyor.**
 önceki dosyalarla aynıydı. Marmara'nın herkese açık paylaşımındaki 14 Eylül
 2026 dosyası 790 kayıt üretiyor. Beş yeni kayıt ve bir mevcut kayıtta içerik
 farkı var. Dosya indirme ve kaynak kontrol tarihleri ayrı tutulur; JSON'u yeniden
-üretmek kaynak kontrol tarihini ilerletmez. Süreç [`VERI-BAKIMI.md`](VERI-BAKIMI.md)'de.
+üretmek kaynak kontrol tarihini ilerletmez.
+
+22 Ekim 2026 kontrolünde MAKÜ, ESOGÜ ve Kırıkkale dosyaları değişmemişti.
+Marmara'nın güncel dosyası 795 kayıt üretiyor: yedi yeni, iki kaldırılmış kayıt
+ve 52 kayıtta dil koşulu notu, geçerlilik veya kontenjan güncellemesi var.
+Bilecik dosyasına 19 bölüm/alan satırı eklendi ve altı satırın geçerlilik
+süresi uzatıldı; kaldırılan satır yok. Süreç [`VERI-BAKIMI.md`](VERI-BAKIMI.md)'de.
 
 Bilecik Şeyh Edebali Üniversitesi'nin [resmî anlaşma sayfasındaki](https://bilecik.edu.tr/uluslararasi/Icerik/Anla%C5%9Fmalar_95fd9)
-Excel'in ilk sayfası okunur. 79 anlaşma grubu, 79 farklı partner adı
-ve 207 bölüm/alan satırı vardır. Sitedeki 207 bölüm/alan kaydı bu satırları ifade eder;
-207 bağımsız anlaşma veya kontenjan anlamına gelmez.
+Excel'in ilk sayfası okunur. 83 anlaşma grubu, 83 farklı partner adı
+ve 226 bölüm/alan satırı vardır. Sitedeki 226 bölüm/alan kaydı bu satırları ifade eder;
+226 bağımsız anlaşma veya kontenjan anlamına gelmez.
 
 - Birleştirilmiş hücreler yalnız Excel'de belirtilen sınırları içinde açılır.
   Gerçekten boş hücreye önceki satırın bölümü taşınmaz.
