@@ -8,6 +8,8 @@ Biçim [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), sürümleme ise
 
 Henüz yayımlanmamış değişiklikler burada tutulur.
 
+- Haftalık kaynak denetimi artık bakımcıya haber veriyor: Kaynak değiştiğinde, kontrol tarihi sitedeki 30 günlük uyarıya bir hafta kaldığında ya da denetim başarısız olduğunda tek bir `kaynak-denetimi` issue'su açılıyor; her şey yolundaysa kendiliğinden kapanıyor.
+
 ## [1.1.0] - 2026-10-22
 
 - GitHub Actions adımları Node 24 üzerinde çalışan güncel major sürümlere yükseltildi; Node 20 desteği kaldırıldığında CI, canlı denetim ve haftalık kaynak denetiminin durması önlendi.

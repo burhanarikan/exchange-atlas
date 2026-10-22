@@ -58,7 +58,7 @@ python3 scripts/build_data.py --pull
 1. **GitHub Depo Devri:**
    - **Settings → General → Danger Zone → Transfer ownership** üzerinden depo yeni kullanıcıya veya organizasyona aktarılır.
    - **Settings → Secrets and variables → Actions → Variables** altında `LIVE_SITE_URL` (`https://exchangeatlas.org`) ve gerekiyorsa `PAGES_ENABLED` (`false` / `true`) değerleri kontrol edilir.
-   - Haftalık salt-okunur kaynak tazelik denetimi ([`.github/workflows/source-check.yml`](.github/workflows/source-check.yml)) yeni depoda **Actions** sekmesinden etkinleştirilir.
+   - Haftalık salt-okunur kaynak tazelik denetimi ([`.github/workflows/source-check.yml`](.github/workflows/source-check.yml)) yeni depoda **Actions** sekmesinden etkinleştirilir. Denetim, veri yenilemesi gerektiğinde `kaynak-denetimi` etiketli bir issue açar; yeni bakımcının depo bildirimlerini (**Watch**) açması yeterlidir.
 
 2. **Cloudflare Pages ve Alan Adı (`exchangeatlas.org`):**
    - Cloudflare Pages projesi yeni GitHub deposuna bağlanır (`Production branch: main`, `Build command: boş`, `Build output directory: site`).

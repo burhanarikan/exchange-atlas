@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  # Yalnız bildirim issue'su için; kaynak ve site dosyaları değiştirilmez.
+  issues: write
 
 jobs:
   source_check:
@@ -36,6 +38,17 @@ jobs:
               durum = "Değişti" if u["sourceChanged"] else "Aynı"
               print(f"| `{u['id']}` | {u['previousCount']} | {u['count']} | +{u['added']} | -{u['removed']} | {durum} |")
           PY
+      # Kaynak değiştiyse, kontrol tarihi 30 günlük uyarıya yaklaştıysa veya denetim
+      # başarısız olduysa tek bir issue açar/günceller; her şey yolundaysa kapatır.
+      - name: gerekirse bakım issue'sunu aç veya kapat
+        if: always() && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: >-
+          python3 scripts/source_check_issue.py --apply
+          --report /tmp/atlas-kaynak-raporu.json
+          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       - uses: actions/upload-artifact@v7
         if: always()
         with:
