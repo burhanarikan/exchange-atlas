@@ -16,14 +16,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.13"
       # node açıkça kuruluyor: iki bağlaşım testi app.js'i node ile çalıştırıyor,
       # node yoksa unittest onları atlıyor ve atlanan test "OK" sayılıyor. Koşucu
       # imajı değişirse iki bekçi sessizce susardı.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
       - run: pip install -r requirements.txt
@@ -100,13 +100,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/checkout@v7
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: site
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # LIVE_SITE_URL tanımlandığında deploy sonrası gerçek HTTP yanıtlarını kontrol eder.
   # GitHub Pages özel header'ları uygulamıyorsa bu iş bilinçli olarak kırılır ve
@@ -118,7 +118,7 @@ jobs:
     if: github.event_name != 'pull_request' && vars.LIVE_SITE_URL != ''
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: canlı önbellek ve ağ raporlama denetimi
         env:
           LIVE_SITE_URL: ${{ vars.LIVE_SITE_URL }}
