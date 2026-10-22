@@ -133,7 +133,7 @@
       b.classList.toggle("active", b.dataset.lang === lang);
     });
 
-    var cu = "burhanarikan", caddr = cu + "@" + "yaani" + ".com";
+    var cu = "nurarikan.contact", caddr = cu + "@" + "gmail" + ".com";
     var cl = document.getElementById("contactLine");
     if (cl) {
       cl.innerHTML = "";

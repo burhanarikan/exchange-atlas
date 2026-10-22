@@ -52,7 +52,7 @@ class YayinKapisi(unittest.TestCase):
     # MUAF listesi kaldırılmadı: Kişisel sağlayıcıya ait başka bir adresin
     # belgelerde kazara yayımlanmasını engelliyor. İleride kurumsal adrese
     # geçilirse adres ve bu liste birlikte güncellenmeli.
-    MUAF = ("burhanarikan@yaani.com",)
+    MUAF = ("nurarikan.contact@gmail.com",)
 
     def yayinda_mi(self):
         return "**Durum:** yayında." in (ROOT / "README.md").read_text(encoding="utf-8")
@@ -293,7 +293,7 @@ class GeriBildirimAdresi(unittest.TestCase):
     yapılan tekil kopya değişikliklerini yakalar.
     """
 
-    BUGUNKU = "burhanarikan@yaani.com"
+    BUGUNKU = "nurarikan.contact@gmail.com"
     DURUM = ("Public depoda ve canlı sitede bilinçli kullanılan geri bildirim "
              "adresi. Kurumsal adrese geçilirse tüm kopyalar birlikte güncellenmeli.")
 

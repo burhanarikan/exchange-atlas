@@ -11,7 +11,7 @@
   // kart eski dilde kalırdı · tek çizim yolu bu sorunu tümüyle kaldırıyor.
   var YUKLEME_HATASI = false;
   // adres bot taramasına karşı parçalı tutulur
-  function adres() { return "burhanarikan" + "@" + "yaani" + ".com"; }
+  function adres() { return "nurarikan.contact" + "@" + "gmail" + ".com"; }
   var TPL = {
     stats: { tr: "{c} anlaşma · {u} partner üniversite · {n} ülke", en: "{c} agreements · {u} partner universities · {n} countries" },
     statsRows: { tr: "{c} bölüm/alan kaydı · {u} partner üniversite · {n} ülke", en: "{c} department/field records · {u} partner universities · {n} countries" },

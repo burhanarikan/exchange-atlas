@@ -240,7 +240,7 @@ class MarkaAdi(unittest.TestCase):
 class RepositoryBaglantisi(unittest.TestCase):
     """GitHub deposu tüm kullanıcı-facing sayfalarda görünür ve tıklanabilir kalmalı."""
 
-    URL = "https://github.com/burhanarikan/exchange-atlas"
+    URL = "https://github.com/nurarikan/exchange-atlas"
 
     def test_repo_linki_kullanici_sayfalarinda_tanimli(self):
         index = (ROOT / "site" / "index.html").read_text(encoding="utf-8")
@@ -507,10 +507,10 @@ class GeriBildirimAdresiUcSayfada(unittest.TestCase):
         """Adresin parçalarını çıkarır: **sırayı değil, malzemeyi**.
 
         Parçalar kaynakta yazıldığı sırayla birleşmiyor. `index.html`'de
-        `var u = "burhanarikan", d = "yaani" + ".com", addr = u + "@" + d`
+        `var u = "kullanici", d = "ornek" + ".com", addr = u + "@" + d`
         yazıyor: `"@"` satırda en sonda geçiyor ama adreste ortada duruyor.
         Bu yüzden parçaları sırayla birleştirmek yanlış sonuç veriyor
-        (ilk denemede `burhanarikanyaani.com@` çıktı).
+        (ilk denemede `kullaniciornek.com@` biçiminde bir sonuç çıktı).
 
         Sıralı bir karşılaştırma için ifadeyi gerçekten çalıştırmak gerekirdi.
         Onun yerine parçaların **kümesi** karşılaştırılıyor: adres değişirse
@@ -520,7 +520,7 @@ class GeriBildirimAdresiUcSayfada(unittest.TestCase):
         bulunan = {}
         for ad in self.DOSYALAR:
             for satir in (ROOT / "site" / ad).read_text(encoding="utf-8").splitlines():
-                if "burhanarikan" not in satir:
+                if "nurarikan.contact" not in satir:
                     continue
                 # Ad başka bağlamlarda da geçiyor · depo adresi gibi. Adresi
                 # KURAN satır "@" parçasını taşıyor, ötekiler taşımıyor.
@@ -548,7 +548,7 @@ class GeriBildirimAdresiUcSayfada(unittest.TestCase):
         for ad in self.DOSYALAR:
             metin = (ROOT / "site" / ad).read_text(encoding="utf-8")
             with self.subTest(dosya=ad):
-                self.assertNotIn("burhanarikan@", metin,
+                self.assertNotIn("nurarikan.contact@", metin,
                                  f"{ad}: adres düz metin yazılmış; bot taramasına açık. "
                                  f"Parçalı yazım korunmalı.")
 
@@ -1419,7 +1419,7 @@ class KaldirmaSozuUcSayfada(unittest.TestCase):
     def test_iletisim_adresi_uc_sayfada_da_yaziyor(self):
         """Söz var ama adres yoksa söz işe yaramıyor."""
         eksik = [ad for ad in self.DOSYALAR
-                 if "burhanarikan" not in (ROOT / "site" / ad).read_text(encoding="utf-8")]
+                 if "nurarikan.contact" not in (ROOT / "site" / ad).read_text(encoding="utf-8")]
         self.assertEqual(eksik, [], f"İletişim adresi olmayan sayfa: {eksik}")
 
     def test_neyin_yazilabilecegi_uc_sayfada_da_ayni(self):

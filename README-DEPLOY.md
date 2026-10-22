@@ -33,7 +33,7 @@ GitHub Actions workflow'u test işini her push ve pull request'te çalıştırı
 Canlı response header doğrulaması için repository variable olarak şu adres tanımlı olmalıdır:
 
 ```bash
-gh variable set LIVE_SITE_URL --body https://exchangeatlas.org -R burhanarikan/exchange-atlas
+gh variable set LIVE_SITE_URL --body https://exchangeatlas.org -R nurarikan/exchange-atlas
 ```
 
 `LIVE_SITE_URL` tanımlandığında workflow ana route'ları, beş üniversite listesini ve MAKÜ rehberini gerçek HTTP yanıtları üzerinden kontrol eder. Cloudflare Pages `_headers` dosyasını parse ederek güvenlik başlıklarını canlı yanıta ekler; başlıklar görünmüyorsa yayın güvenli kabul edilmez.
@@ -197,7 +197,7 @@ Yayının canlı olması, anlaşma bilgilerinin başvuru dönemi için kesin vey
 
 ## 9. Cloudflare Pages ile kanonik yayın
 
-GitHub Pages response header'ları uygulamıyorsa Cloudflare Pages kanonik yayın katmanı olarak kullanılabilir. Cloudflare dashboard'da **Workers & Pages > Create application > Pages > Connect to Git** akışından `burhanarikan/exchange-atlas` deposunu bağlayın. Production branch `main`, Root directory `/`, Build command boş ve Build output directory `site` olmalıdır. Framework seçmeyin; proje doğrudan statik HTML'dir.
+GitHub Pages response header'ları uygulamıyorsa Cloudflare Pages kanonik yayın katmanı olarak kullanılabilir. Cloudflare dashboard'da **Workers & Pages > Create application > Pages > Connect to Git** akışından `nurarikan/exchange-atlas` deposunu bağlayın. Production branch `main`, Root directory `/`, Build command boş ve Build output directory `site` olmalıdır. Framework seçmeyin; proje doğrudan statik HTML'dir.
 
 Pages projesi oluşturulduktan sonra **Custom domains > Set up a domain** üzerinden `exchangeatlas.org` alan adını ekleyin. Apex alan adı kullanıldığı için domain Cloudflare hesabında zone olarak bulunmalı ve nameserver'lar Cloudflare'a yönlenmelidir. Cloudflare, custom domain ilişkilendirmesi tamamlandıktan sonra sertifika ve DNS durumunu dashboard'da gösterir. Sadece DNS'e elle CNAME eklemek custom domain ilişkilendirmesinin yerine geçmez.
 

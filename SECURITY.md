@@ -6,7 +6,7 @@ Yalnızca `main` dalındaki güncel sürüm desteklenir. Exchange Atlas sunucu t
 
 ## Güvenlik bildirimi
 
-Bir güvenlik açığı bulduysanız ayrıntıları kamuya açık issue olarak paylaşmadan önce proje sahibine doğrudan yazın: `burhanarikan@yaani.com`. Bildiriminize etkilenen URL veya dosyayı, yeniden üretme adımlarını, beklenen ve gerçekleşen davranışı ve mümkünse etki değerlendirmesini ekleyin.
+Bir güvenlik açığı bulduysanız ayrıntıları kamuya açık issue olarak paylaşmadan önce proje sahibine doğrudan yazın: `nurarikan.contact@gmail.com`. Bildiriminize etkilenen URL veya dosyayı, yeniden üretme adımlarını, beklenen ve gerçekleşen davranışı ve mümkünse etki değerlendirmesini ekleyin.
 
 Kimlik bilgisi, token, parola veya kişisel veri içeren kanıtları e-posta gövdesine ya da issue'ya koymayın. Gerekirse yalnızca güvenli ve sınırlı bir kanıt paylaşın. Proje sahibi bildirimi aldıktan sonra erişim ve etkiyi doğrular; düzeltme yayımlandığında bildirimi yapan kişiye geri dönüş yapılır. Belirli bir yanıt süresi garanti edilmez, ancak güvenlik bildirimleri normal özellik taleplerinden öncelikli değerlendirilir.
 

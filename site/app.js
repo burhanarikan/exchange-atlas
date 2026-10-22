@@ -144,7 +144,7 @@ let shown = PAGE;
 const state = { q: "", qWords: [], countries: new Set(), families: new Set(), levels: new Set(), onlyQuota: false };
 
 // The address is assembled from parts: scrapers look for plain-text e-mail.
-const GERI_BILDIRIM = "burhanarikan" + "@" + "yaani" + ".com";
+const GERI_BILDIRIM = "nurarikan.contact" + "@" + "gmail" + ".com";
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"]/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
 const oneLine = (s) => String(s || "").replace(/\s*\n\s*/g, " ").trim();
@@ -220,7 +220,7 @@ async function init() {
 }
 
 const KAYNAK_BELGESI =
-  "https://github.com/burhanarikan/exchange-atlas/blob/main/KAYNAK.md";
+  "https://github.com/nurarikan/exchange-atlas/blob/main/KAYNAK.md";
 
 function cizSourceNotice() {
   const el = $("#sourceNotice");
@@ -608,8 +608,8 @@ function applyLang() {
   if (kanonik) kanonik.href = kanonik.href.split("?")[0] + `?uni=${encodeURIComponent(UNI.id)}`;
 
   if (repo) repo.innerHTML = lang === "en"
-    ? '<span>Code, source documents and contributions: </span><a href="https://github.com/burhanarikan/exchange-atlas" target="_blank" rel="noopener">GitHub repository</a>.'
-    : '<span>Kod, kaynak belgeler ve katkılar için: </span><a href="https://github.com/burhanarikan/exchange-atlas" target="_blank" rel="noopener">GitHub deposu</a>.';
+    ? '<span>Code, source documents and contributions: </span><a href="https://github.com/nurarikan/exchange-atlas" target="_blank" rel="noopener">GitHub repository</a>.'
+    : '<span>Kod, kaynak belgeler ve katkılar için: </span><a href="https://github.com/nurarikan/exchange-atlas" target="_blank" rel="noopener">GitHub deposu</a>.';
   document.title = `Exchange Atlas · Erasmus · ${UNI.abbr} ` + L.descriptor;
 }
 

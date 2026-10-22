@@ -429,7 +429,7 @@ süresi geçmiş görünen üç kaydın uyarıyla korunması da yeniden denetlen
 
 Üç yol var, üçü de yeterli:
 
-- **E-posta:** burhanarikan@yaani.com
+- **E-posta:** nurarikan.contact@gmail.com
 - **Bu sayfadaki bir kart yanlışsa** ekran görüntüsü göndermek yeterli, kaydı biz
   buluruz
 - **Tablo düzeyinde bir şey söylemek isterseniz** hangi sütun, hangi satır demeniz

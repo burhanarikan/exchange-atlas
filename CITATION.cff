@@ -4,10 +4,10 @@ title: "Exchange Atlas"
 abstract: "Üniversitelerin Erasmus+ kurumlar arası ikili anlaşmalarını aranabilir ve filtrelenebilir biçimde sunan bağımsız, statik platform."
 version: "1.1.0"
 date-released: 2026-10-22
-repository-code: "https://github.com/burhanarikan/exchange-atlas"
+repository-code: "https://github.com/nurarikan/exchange-atlas"
 url: "https://exchangeatlas.org"
 license: "MIT"
 authors:
   - family-names: "Arıkan"
-    given-names: "Burhan"
+    given-names: "Havva Nur"
     affiliation: "Independent"
